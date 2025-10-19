@@ -1,0 +1,888 @@
+{
+  "metadata": {
+    "projectName": "default",
+    "generatedAt": "2025-10-18T08:00:54.810Z",
+    "simulationVersion": "2.0",
+    "startTime": "07:00",
+    "endTime": "10:00",
+    "startTimeSeconds": 25200,
+    "endTimeSeconds": 36000,
+    "totalDurationSeconds": 10800,
+    "vehicleCount": 2,
+    "demandCount": 30,
+    "completedDemands": 0,
+    "rejectedDemands": 0,
+    "averageWaitTime": 0,
+    "averageServiceTime": 0,
+    "vehicleUtilizationRate": 0
+  },
+  "configuration": {
+    "waitTimeLimit": 10,
+    "operatingTime": {
+      "start": "07:00",
+      "end": "10:00"
+    },
+    "jobTypes": {}
+  },
+  "vehicles": [
+    {
+      "id": "vehicle_001",
+      "name": "Vehicle_1",
+      "initialLocation": [
+        126.978,
+        37.5665
+      ],
+      "capacity": 4,
+      "statistics": {
+        "total_jobs": 0,
+        "total_distance": 0,
+        "total_service_time": 0,
+        "idle_time": 10800,
+        "moving_time": 0,
+        "working_time": 0
+      },
+      "timeline": [
+        {
+          "timestamp": 25200,
+          "type": "simulation_start",
+          "state": "idle",
+          "location": [
+            126.978,
+            37.5665
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vehicle_002",
+      "name": "Vehicle_2",
+      "initialLocation": [
+        126.9895,
+        37.5651
+      ],
+      "capacity": 4,
+      "statistics": {
+        "total_jobs": 0,
+        "total_distance": 0,
+        "total_service_time": 0,
+        "idle_time": 10800,
+        "moving_time": 0,
+        "working_time": 0
+      },
+      "timeline": [
+        {
+          "timestamp": 25200,
+          "type": "simulation_start",
+          "state": "idle",
+          "location": [
+            126.9895,
+            37.5651
+          ]
+        }
+      ]
+    }
+  ],
+  "routes": [],
+  "demands": [
+    {
+      "id": "demand_001",
+      "timestamp": 0,
+      "requestTime": "m5UdEg",
+      "location": [
+        126.9844,
+        null
+      ],
+      "address": "37.4672",
+      "job_type": "08:40:47",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_002",
+      "timestamp": 0,
+      "requestTime": "11uu53",
+      "location": [
+        126.8724,
+        null
+      ],
+      "address": "37.5375",
+      "job_type": "07:13:27",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_003",
+      "timestamp": 0,
+      "requestTime": "JVSGS7",
+      "location": [
+        127.0218,
+        null
+      ],
+      "address": "37.5891",
+      "job_type": "09:29:56",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_004",
+      "timestamp": 0,
+      "requestTime": "GdfSTh",
+      "location": [
+        126.8129,
+        null
+      ],
+      "address": "37.4962",
+      "job_type": "07:37:28",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_005",
+      "timestamp": 0,
+      "requestTime": "UaeoBY",
+      "location": [
+        127.0324,
+        null
+      ],
+      "address": "37.5718",
+      "job_type": "08:16:24",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_006",
+      "timestamp": 0,
+      "requestTime": "UNIrsZ",
+      "location": [
+        126.8236,
+        null
+      ],
+      "address": "37.6861",
+      "job_type": "09:21:06",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_007",
+      "timestamp": 0,
+      "requestTime": "MKFe5x",
+      "location": [
+        126.862,
+        null
+      ],
+      "address": "37.4829",
+      "job_type": "09:13:07",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_008",
+      "timestamp": 0,
+      "requestTime": "mlMO0g",
+      "location": [
+        126.978,
+        null
+      ],
+      "address": "37.5501",
+      "job_type": "07:07:55",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_009",
+      "timestamp": 0,
+      "requestTime": "O1T0HV",
+      "location": [
+        127.0622,
+        null
+      ],
+      "address": "37.6919",
+      "job_type": "07:52:02",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_010",
+      "timestamp": 0,
+      "requestTime": "NJp4J8",
+      "location": [
+        126.8516,
+        null
+      ],
+      "address": "37.5128",
+      "job_type": "08:26:19",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_011",
+      "timestamp": 0,
+      "requestTime": "N0KC7H",
+      "location": [
+        127.0253,
+        null
+      ],
+      "address": "37.4851",
+      "job_type": "08:14:49",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_012",
+      "timestamp": 0,
+      "requestTime": "HOBHbF",
+      "location": [
+        126.948,
+        null
+      ],
+      "address": "37.4813",
+      "job_type": "09:21:28",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_013",
+      "timestamp": 0,
+      "requestTime": "raiMwM",
+      "location": [
+        126.8933,
+        null
+      ],
+      "address": "37.4879",
+      "job_type": "09:52:46",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_014",
+      "timestamp": 0,
+      "requestTime": "dhlDOe",
+      "location": [
+        126.856,
+        null
+      ],
+      "address": "37.6938",
+      "job_type": "08:08:12",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_015",
+      "timestamp": 0,
+      "requestTime": "EeR6mu",
+      "location": [
+        126.9712,
+        null
+      ],
+      "address": "37.6433",
+      "job_type": "07:15:19",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_016",
+      "timestamp": 0,
+      "requestTime": "j3q2Ds",
+      "location": [
+        126.8875,
+        null
+      ],
+      "address": "37.4967",
+      "job_type": "09:06:38",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_017",
+      "timestamp": 0,
+      "requestTime": "XsTOub",
+      "location": [
+        127.1565,
+        null
+      ],
+      "address": "37.5408",
+      "job_type": "08:21:04",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_018",
+      "timestamp": 0,
+      "requestTime": "IUdXkJ",
+      "location": [
+        127.1265,
+        null
+      ],
+      "address": "37.4845",
+      "job_type": "09:56:43",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_019",
+      "timestamp": 0,
+      "requestTime": "yATdIm",
+      "location": [
+        126.9148,
+        null
+      ],
+      "address": "37.4727",
+      "job_type": "07:42:58",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_020",
+      "timestamp": 0,
+      "requestTime": "ao0OKa",
+      "location": [
+        126.8168,
+        null
+      ],
+      "address": "37.6565",
+      "job_type": "08:28:01",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_021",
+      "timestamp": 0,
+      "requestTime": "NYZFps",
+      "location": [
+        127.1366,
+        null
+      ],
+      "address": "37.5247",
+      "job_type": "08:12:51",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_022",
+      "timestamp": 0,
+      "requestTime": "qioshy",
+      "location": [
+        126.9874,
+        null
+      ],
+      "address": "37.472",
+      "job_type": "09:11:19",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_023",
+      "timestamp": 0,
+      "requestTime": "jUOFUM",
+      "location": [
+        126.9247,
+        null
+      ],
+      "address": "37.6553",
+      "job_type": "09:05:12",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_024",
+      "timestamp": 0,
+      "requestTime": "Z15nEc",
+      "location": [
+        126.9727,
+        null
+      ],
+      "address": "37.5476",
+      "job_type": "07:34:41",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_025",
+      "timestamp": 0,
+      "requestTime": "Gzq6wv",
+      "location": [
+        126.8408,
+        null
+      ],
+      "address": "37.6077",
+      "job_type": "08:24:41",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_026",
+      "timestamp": 0,
+      "requestTime": "QeEmAp",
+      "location": [
+        126.8287,
+        null
+      ],
+      "address": "37.6566",
+      "job_type": "09:03:53",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_027",
+      "timestamp": 0,
+      "requestTime": "vEKDz1",
+      "location": [
+        126.9266,
+        null
+      ],
+      "address": "37.5098",
+      "job_type": "08:39:37",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_028",
+      "timestamp": 0,
+      "requestTime": "cha9SR",
+      "location": [
+        127.102,
+        null
+      ],
+      "address": "37.6127",
+      "job_type": "07:26:07",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_029",
+      "timestamp": 0,
+      "requestTime": "Gz434L",
+      "location": [
+        126.8757,
+        null
+      ],
+      "address": "37.6784",
+      "job_type": "08:38:33",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_030",
+      "timestamp": 0,
+      "requestTime": "3iXsps",
+      "location": [
+        126.9086,
+        null
+      ],
+      "address": "37.685",
+      "job_type": "09:49:01",
+      "status": "pending",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 0,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    }
+  ],
+  "events": [
+    {
+      "timestamp": 25200,
+      "type": "simulation_start",
+      "data": {
+        "vehicles": 2,
+        "initialIdleVehicles": 2,
+        "demands": 30
+      }
+    },
+    {
+      "timestamp": 36001,
+      "type": "simulation_end",
+      "data": {
+        "completedDemands": 0,
+        "rejectedDemands": 0,
+        "totalVehicleJobs": 0
+      }
+    }
+  ]
+}

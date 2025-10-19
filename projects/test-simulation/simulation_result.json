@@ -1,0 +1,369 @@
+{
+  "metadata": {
+    "projectName": "test-simulation",
+    "generatedAt": "2025-10-18T07:46:03.575Z",
+    "simulationVersion": "2.0",
+    "startTime": "07:00",
+    "endTime": "07:30",
+    "startTimeSeconds": 25200,
+    "endTimeSeconds": 27000,
+    "totalDurationSeconds": 1800,
+    "vehicleCount": 3,
+    "demandCount": 5,
+    "completedDemands": 0,
+    "rejectedDemands": 5,
+    "averageWaitTime": 0,
+    "averageServiceTime": 0,
+    "vehicleUtilizationRate": 0
+  },
+  "configuration": {
+    "waitTimeLimit": 10,
+    "operatingTime": {
+      "start": "07:00",
+      "end": "07:30"
+    },
+    "jobTypes": {}
+  },
+  "vehicles": [
+    {
+      "id": "vehicle_001",
+      "name": "Vehicle_1",
+      "initialLocation": [
+        126.978,
+        37.5665
+      ],
+      "job_type": "call",
+      "capacity": 4,
+      "statistics": {
+        "total_jobs": 0,
+        "total_distance": 0,
+        "total_service_time": 0,
+        "idle_time": 1800,
+        "moving_time": 0,
+        "working_time": 0
+      },
+      "timeline": [
+        {
+          "timestamp": 25200,
+          "type": "simulation_start",
+          "state": "idle",
+          "location": [
+            126.978,
+            37.5665
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vehicle_002",
+      "name": "Vehicle_2",
+      "initialLocation": [
+        126.98,
+        37.57
+      ],
+      "job_type": "call",
+      "capacity": 4,
+      "statistics": {
+        "total_jobs": 0,
+        "total_distance": 0,
+        "total_service_time": 0,
+        "idle_time": 1800,
+        "moving_time": 0,
+        "working_time": 0
+      },
+      "timeline": [
+        {
+          "timestamp": 25200,
+          "type": "simulation_start",
+          "state": "idle",
+          "location": [
+            126.98,
+            37.57
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vehicle_003",
+      "name": "Vehicle_3",
+      "initialLocation": [
+        126.985,
+        37.565
+      ],
+      "job_type": "call",
+      "capacity": 4,
+      "statistics": {
+        "total_jobs": 0,
+        "total_distance": 0,
+        "total_service_time": 0,
+        "idle_time": 1800,
+        "moving_time": 0,
+        "working_time": 0
+      },
+      "timeline": [
+        {
+          "timestamp": 25200,
+          "type": "simulation_start",
+          "state": "idle",
+          "location": [
+            126.985,
+            37.565
+          ]
+        }
+      ]
+    }
+  ],
+  "routes": [],
+  "demands": [
+    {
+      "id": "demand_001",
+      "timestamp": 25500,
+      "requestTime": "07:05",
+      "location": [
+        126.979,
+        37.568
+      ],
+      "address": "서울특별시 종로구 삼일대로",
+      "job_type": "call",
+      "status": "rejected",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 25500,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_002",
+      "timestamp": 25800,
+      "requestTime": "07:10",
+      "location": [
+        126.981,
+        37.572
+      ],
+      "address": "서울특별시 종로구 종로",
+      "job_type": "call",
+      "status": "rejected",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 25800,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_003",
+      "timestamp": 26100,
+      "requestTime": "07:15",
+      "location": [
+        126.986,
+        37.566
+      ],
+      "address": "서울특별시 종로구 인사동",
+      "job_type": "call",
+      "status": "rejected",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 26100,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_004",
+      "timestamp": 26400,
+      "requestTime": "07:20",
+      "location": [
+        126.982,
+        37.569
+      ],
+      "address": "서울특별시 종로구 창경궁로",
+      "job_type": "call",
+      "status": "rejected",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 26400,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    },
+    {
+      "id": "demand_005",
+      "timestamp": 26700,
+      "requestTime": "07:25",
+      "location": [
+        126.987,
+        37.564
+      ],
+      "address": "서울특별시 종로구 돈화문로",
+      "job_type": "call",
+      "status": "rejected",
+      "assignedVehicle": null,
+      "dispatchInfo": null,
+      "timeline": {
+        "requested": 26700,
+        "dispatched": null,
+        "arrived": null,
+        "workStarted": null,
+        "workCompleted": null
+      },
+      "metrics": {
+        "waitTime": null,
+        "serviceTime": null,
+        "totalTime": null
+      }
+    }
+  ],
+  "events": [
+    {
+      "timestamp": 25200,
+      "type": "simulation_start",
+      "data": {
+        "vehicles": 3,
+        "initialIdleVehicles": 3,
+        "demands": 5
+      }
+    },
+    {
+      "timestamp": 25500,
+      "type": "demand_occurred",
+      "data": {
+        "demandId": "demand_001",
+        "location": [
+          126.979,
+          37.568
+        ],
+        "job_type": "call"
+      }
+    },
+    {
+      "timestamp": 25500,
+      "type": "demand_rejected",
+      "data": {
+        "demandId": "demand_001",
+        "reason": "no_vehicle_available"
+      }
+    },
+    {
+      "timestamp": 25800,
+      "type": "demand_occurred",
+      "data": {
+        "demandId": "demand_002",
+        "location": [
+          126.981,
+          37.572
+        ],
+        "job_type": "call"
+      }
+    },
+    {
+      "timestamp": 25800,
+      "type": "demand_rejected",
+      "data": {
+        "demandId": "demand_002",
+        "reason": "no_vehicle_available"
+      }
+    },
+    {
+      "timestamp": 26100,
+      "type": "demand_occurred",
+      "data": {
+        "demandId": "demand_003",
+        "location": [
+          126.986,
+          37.566
+        ],
+        "job_type": "call"
+      }
+    },
+    {
+      "timestamp": 26100,
+      "type": "demand_rejected",
+      "data": {
+        "demandId": "demand_003",
+        "reason": "no_vehicle_available"
+      }
+    },
+    {
+      "timestamp": 26400,
+      "type": "demand_occurred",
+      "data": {
+        "demandId": "demand_004",
+        "location": [
+          126.982,
+          37.569
+        ],
+        "job_type": "call"
+      }
+    },
+    {
+      "timestamp": 26400,
+      "type": "demand_rejected",
+      "data": {
+        "demandId": "demand_004",
+        "reason": "no_vehicle_available"
+      }
+    },
+    {
+      "timestamp": 26700,
+      "type": "demand_occurred",
+      "data": {
+        "demandId": "demand_005",
+        "location": [
+          126.987,
+          37.564
+        ],
+        "job_type": "call"
+      }
+    },
+    {
+      "timestamp": 26700,
+      "type": "demand_rejected",
+      "data": {
+        "demandId": "demand_005",
+        "reason": "no_vehicle_available"
+      }
+    },
+    {
+      "timestamp": 27001,
+      "type": "simulation_end",
+      "data": {
+        "completedDemands": 0,
+        "rejectedDemands": 5,
+        "totalVehicleJobs": 0
+      }
+    }
+  ]
+}
