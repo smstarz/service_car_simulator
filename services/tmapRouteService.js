@@ -293,4 +293,6 @@ class TmapRouteService {
 // 싱글톤 인스턴스 생성
 const tmapRouteService = new TmapRouteService();
 
+// Export both class and instance
 module.exports = tmapRouteService;
+module.exports.TmapRouteService = TmapRouteService;

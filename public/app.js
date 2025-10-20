@@ -1,12 +1,66 @@
 import { validateAndNormalizeRows } from './utils/csv.js';
-import { DemandMarkersManager } from './utils/demandMarkers.js';
+import { SimulationVisualizer } from './utils/simulationVisualizer.js';
 import { VehicleSettingsManager } from './utils/vehicleSettings.js';
 import { JobTypeSettingsManager } from './utils/jobTypeSettings.js';
+import { ReportGenerator } from './utils/reportGenerator.js';
 
 // Global instances
-let demandMarkersManager = null;
+let simulationVisualizer = null;
 let vehicleSettingsManager = null;
 let jobTypeSettingsManager = null;
+let reportGenerator = null;
+
+// Update the Vehicle count shown in the Settings panel for a given project
+async function updateVehicleCountUI(projectName) {
+  try {
+    if (!projectName) return;
+    // ensure vehicle settings are loaded for this project
+    if (!vehicleSettingsManager) return;
+    try {
+      await vehicleSettingsManager.loadVehicles(projectName);
+    } catch (err) {
+      console.warn('updateVehicleCountUI: failed to load vehicles, using defaults', err);
+    }
+
+    const count = Array.isArray(vehicleSettingsManager.vehicleData) ? vehicleSettingsManager.vehicleData.length : 0;
+    const display = String(count).padStart(2, '0');
+
+    // find the setting box whose label is 'Vehicle' and update its .setting-value
+    document.querySelectorAll('.setting-box').forEach(box => {
+      const label = box.querySelector('.setting-label-small');
+      if (label && label.textContent && label.textContent.trim() === 'Vehicle') {
+        const valEl = box.querySelector('.setting-value');
+        if (valEl) valEl.textContent = display;
+      }
+    });
+  } catch (err) {
+    console.error('updateVehicleCountUI error', err);
+  }
+}
+
+// Update the Job Type count shown in the Settings panel for a given project
+async function updateJobTypeCountUI(projectName) {
+  try {
+    if (!projectName) return;
+    if (!jobTypeSettingsManager) return;
+    try {
+      await jobTypeSettingsManager.loadJobTypes(projectName);
+    } catch (err) {
+      console.warn('updateJobTypeCountUI: failed to load job types, using defaults', err);
+    }
+    const count = Array.isArray(jobTypeSettingsManager.jobTypeData) ? jobTypeSettingsManager.jobTypeData.length : 0;
+    const display = String(count).padStart(2, '0');
+    document.querySelectorAll('.setting-box').forEach(box => {
+      const label = box.querySelector('.setting-label-small');
+      if (label && label.textContent && label.textContent.trim() === 'Job type') {
+        const valEl = box.querySelector('.setting-value');
+        if (valEl) valEl.textContent = display;
+      }
+    });
+  } catch (err) {
+    console.error('updateJobTypeCountUI error', err);
+  }
+}
 
 // Fetch token from server config endpoint and init Mapbox map
 async function init(){
@@ -27,17 +81,82 @@ async function init(){
       zoom: 12
     });
 
-    // Initialize demand markers manager
-    demandMarkersManager = new DemandMarkersManager(map);
+    // Initialize simulation visualizer
+    simulationVisualizer = new SimulationVisualizer(map);
+
+    // Global UI setting: showAddressLabel (default false/unchecked)
+    window.appSettings = {
+      showAddressLabel: false
+    };
+
+    // Wire the checkbox to toggle showing address labels on markers
+    const showAddressCheckbox = document.getElementById('toggle-show-address');
+    if (showAddressCheckbox) {
+      // default unchecked
+      showAddressCheckbox.checked = false;
+      showAddressCheckbox.addEventListener('change', (ev) => {
+        window.appSettings.showAddressLabel = !!ev.target.checked;
+        // inform visualizer of the new setting
+        if (simulationVisualizer && typeof simulationVisualizer.setShowAddressLabel === 'function') {
+          simulationVisualizer.setShowAddressLabel(window.appSettings.showAddressLabel);
+        }
+      });
+    }
 
     // simple map placeholder controls
     map.addControl(new mapboxgl.NavigationControl());
+
+    // Initialize report generator
+    reportGenerator = new ReportGenerator();
 
     // wire Download Form button
     const downloadBtn = document.getElementById('download-form');
     if (downloadBtn) {
       downloadBtn.addEventListener('click', () => {
         window.location.href = '/download/form';
+      });
+    }
+
+    // wire Create Report button
+    const createReportBtn = document.getElementById('create-report');
+    if (createReportBtn) {
+      createReportBtn.addEventListener('click', async () => {
+        const projectName = projectSelect ? projectSelect.value : null;
+        if (!projectName) {
+          alert('Please select a project first');
+          return;
+        }
+
+        try {
+          // Load simulation data
+          await reportGenerator.loadSimulationData(projectName);
+          
+          // Check if report already exists
+          const exists = await reportGenerator.reportExists();
+          
+          if (exists) {
+            // Load and display existing report
+            console.log('Loading existing report...');
+            const reportWindow = window.open('', 'SimulationReport', 'width=1200,height=800,scrollbars=yes');
+            
+            const html = await reportGenerator.loadExistingReport();
+            reportWindow.document.write(html);
+            reportWindow.document.close();
+            
+            // Initialize charts
+            reportWindow.addEventListener('load', () => {
+              const vehicleStats = reportGenerator.getVehicleStats();
+              reportGenerator.initializeCharts(reportWindow, vehicleStats);
+            });
+          } else {
+            // Create new report
+            console.log('Creating new report...');
+            reportGenerator.createReportPopup();
+          }
+        } catch (error) {
+          console.error('Failed to create report:', error);
+          alert('Failed to create report. Please make sure a simulation has been run for this project.');
+        }
       });
     }
 
@@ -160,6 +279,9 @@ async function init(){
                     `차량 가동률: ${data.summary.utilization}\n\n` +
                     `결과 파일: ${data.resultFile}`
                   );
+                  
+                  // Reload simulation result visualization
+                  loadProjectDemand(projectName);
                 }, 500);
                 break;
 
@@ -220,6 +342,10 @@ async function init(){
           if (list.length > 0) {
             projectSelect.value = list[0];
             loadProjectDemand(list[0]);
+            // update vehicle count UI for the selected project
+            updateVehicleCountUI(list[0]);
+            // update job type count UI for the selected project
+            updateJobTypeCountUI(list[0]);
           }
         })
         .catch(err => {
@@ -260,7 +386,7 @@ async function init(){
         if (!res.ok) {
           // no file, clear table
           clearTablePlaceholder();
-          if (demandMarkersManager) demandMarkersManager.clear();
+          if (simulationVisualizer) simulationVisualizer.clear();
           return;
         }
         const text = await res.text();
@@ -270,9 +396,35 @@ async function init(){
         currentErrors = result.errors || [];
         populateTableFromCSVText(currentRows, currentErrors);
         
-        // Load demand data into markers manager
-        if (demandMarkersManager && currentRows) {
-          demandMarkersManager.loadDemandData(currentRows);
+        // Load simulation result if exists
+        try {
+          const simRes = await fetch(`/projects/${encodeURIComponent(projectName)}/simulation-result`);
+          if (simRes.ok) {
+            const simulationData = await simRes.json();
+            console.log('📊 Loaded simulation result:', simulationData);
+            if (simulationVisualizer) {
+              simulationVisualizer.loadSimulationData(simulationData);
+            }
+            // Enable player controls when simulation result is available
+            if (window.playbackState && window.playbackState.setPlayerControlsEnabled) {
+              window.playbackState.setPlayerControlsEnabled(true);
+            }
+          } else {
+            console.log('ℹ️ No simulation result found for this project');
+            if (simulationVisualizer) {
+              simulationVisualizer.clear();
+            }
+            // Disable player controls when no simulation result
+            if (window.playbackState && window.playbackState.setPlayerControlsEnabled) {
+              window.playbackState.setPlayerControlsEnabled(false);
+            }
+          }
+        } catch (err) {
+          console.warn('Failed to load simulation result:', err);
+          // Disable player controls on error
+          if (window.playbackState && window.playbackState.setPlayerControlsEnabled) {
+            window.playbackState.setPlayerControlsEnabled(false);
+          }
         }
       } catch (err) {
         console.error('Failed to load project demand', err);
@@ -281,15 +433,72 @@ async function init(){
 
     // attach change handler for project select
     if (projectSelect) {
-      projectSelect.addEventListener('change', (e) => {
+      projectSelect.addEventListener('change', async (e) => {
         const name = e.target.value;
         if (name) {
           loadProjectDemand(name);
           // 프로젝트 변경 시 차량 설정 로드
+          // update vehicle count UI
+          updateVehicleCountUI(name);
+            // update job type count UI
+            updateJobTypeCountUI(name);
           if (vehicleSettingsManager) {
             vehicleSettingsManager.loadVehicles(name).catch(err => {
               console.error('Failed to load vehicles:', err);
             });
+          }
+            if (jobTypeSettingsManager) {
+              jobTypeSettingsManager.loadJobTypes(name).catch(err => {
+                console.error('Failed to load job types:', err);
+              });
+            }
+          
+          // Check if simulation_result.json exists for this project
+          try {
+            const simResultRes = await fetch(`/projects/${encodeURIComponent(name)}/simulation-result`);
+            if (simResultRes.ok) {
+              // Simulation result exists, enable player controls
+              if (window.playbackState && window.playbackState.setPlayerControlsEnabled) {
+                window.playbackState.setPlayerControlsEnabled(true);
+              }
+              console.log('✅ Simulation result found, player controls enabled');
+              
+              // Enable Create Report button
+              const createReportBtn = document.getElementById('create-report');
+              if (createReportBtn) {
+                createReportBtn.disabled = false;
+                createReportBtn.style.opacity = '1';
+                createReportBtn.style.cursor = 'pointer';
+              }
+            } else {
+              // No simulation result, disable player controls
+              if (window.playbackState && window.playbackState.setPlayerControlsEnabled) {
+                window.playbackState.setPlayerControlsEnabled(false);
+              }
+              console.log('⚠️ No simulation result found, player controls disabled');
+              
+              // Disable Create Report button
+              const createReportBtn = document.getElementById('create-report');
+              if (createReportBtn) {
+                createReportBtn.disabled = true;
+                createReportBtn.style.opacity = '0.5';
+                createReportBtn.style.cursor = 'not-allowed';
+              }
+            }
+          } catch (err) {
+            console.error('Failed to check simulation result:', err);
+            // On error, disable player controls to be safe
+            if (window.playbackState && window.playbackState.setPlayerControlsEnabled) {
+              window.playbackState.setPlayerControlsEnabled(false);
+            }
+            
+            // Disable Create Report button on error
+            const createReportBtn = document.getElementById('create-report');
+            if (createReportBtn) {
+              createReportBtn.disabled = true;
+              createReportBtn.style.opacity = '0.5';
+              createReportBtn.style.cursor = 'not-allowed';
+            }
           }
         }
       });
@@ -338,58 +547,40 @@ async function init(){
       fileInput.addEventListener('change', async (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const text = evt.target.result;
-          try {
-            const rows = parseCSV(text);
-            if (!rows || rows.length === 0) {
-              alert('CSV 파일이 비어있습니다.');
-              return;
-            }
 
-            // validate and normalize rows using utils
-            const result = validateAndNormalizeRows(rows);
-            const normalized = result.rows; // header + data rows
-            // render normalized rows into table and highlight errors if any
-            currentRows = normalized;
-            currentErrors = result.errors || [];
-            populateTableFromCSVText(currentRows, currentErrors);
+        // Check if a project is selected
+        const currentProject = projectSelect ? projectSelect.value : null;
+        if (!currentProject) {
+          alert('프로젝트를 먼저 선택해주세요.');
+          return;
+        }
 
-            // Load demand data into markers manager
-            if (demandMarkersManager && normalized) {
-              demandMarkersManager.loadDemandData(normalized);
-            }
+        try {
+          // Upload file to server and save to project folder
+          const formData = new FormData();
+          formData.append('file', file);
 
-            // save normalized CSV text into project if selected
-            const currentProject = projectSelect ? projectSelect.value : null;
-            if (currentProject) {
-              // reconstruct CSV text from normalized rows
-              const csvText = normalized.map(r => r.map(cell => {
-                // escape if contains comma or quote
-                if (cell == null) return '';
-                const s = String(cell);
-                if (s.includes(',') || s.includes('"') || s.includes('\n')) {
-                  return '"' + s.replace(/"/g, '""') + '"';
-                }
-                return s;
-              }).join(',')).join('\n');
+          const uploadRes = await fetch(`/projects/${encodeURIComponent(currentProject)}/demand`, {
+            method: 'POST',
+            body: formData
+          });
 
-              fetch(`/projects/${encodeURIComponent(currentProject)}/demand`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ csv: csvText })
-              }).then(r => r.json()).then(j => {
-                if (!j || j.error) console.warn('Failed to save CSV to project', j && j.error);
-              }).catch(err => console.error('Failed to save csv to project', err));
-            }
-
-          } catch (err) {
-            console.error('CSV parsing error', err);
-            alert('CSV 파싱 중 오류가 발생했습니다. 콘솔을 확인하세요.');
+          if (!uploadRes.ok) {
+            const errJson = await uploadRes.json();
+            alert('파일 업로드 실패: ' + (errJson.error || uploadRes.statusText));
+            return;
           }
-        };
-        reader.readAsText(file, 'utf-8');
+
+          // File successfully saved to server, now load it just like project selection
+          await loadProjectDemand(currentProject);
+          
+          console.log('✅ CSV file uploaded and processed successfully');
+
+        } catch (err) {
+          console.error('CSV upload error', err);
+          alert('CSV 업로드 중 오류가 발생했습니다. 콘솔을 확인하세요.');
+        }
+
         // reset input so same file can be selected again if needed
         fileInput.value = null;
       });
@@ -455,8 +646,56 @@ async function init(){
               td.classList.add('cell-error');
               td.title = fieldErrors.map(fe => fe.message).join('; ');
             }
+            // id column: clickable to focus on demand and update slider
+            if (col === 'id') {
+              td.style.cursor = 'pointer';
+              td.addEventListener('click', () => {
+                const demandId = td.textContent.trim();
+                const timeIdx = header.indexOf('time');
+                const lonIdx = header.indexOf('longitude');
+                const latIdx = header.indexOf('latitude');
+                
+                if (demandId && timeIdx >= 0 && lonIdx >= 0 && latIdx >= 0 && currentRows && currentRows[i]) {
+                  const timeStr = currentRows[i][timeIdx];
+                  const lon = parseFloat(currentRows[i][lonIdx]);
+                  const lat = parseFloat(currentRows[i][latIdx]);
+                  
+                  // Focus map on this demand
+                  if (!isNaN(lon) && !isNaN(lat)) {
+                    simulationVisualizer.focusDemand(demandId, [lon, lat]);
+                  }
+                  
+                  // Update slider to match time
+                  if (timeStr && /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/.test(timeStr)) {
+                    const parts = timeStr.split(':').map(p => Number(p || 0));
+                    const timeSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+                    
+                    // Access noUiSlider instance directly from DOM element
+                    const timelineEl = document.getElementById('timeline-slider');
+                    if (timelineEl && timelineEl.noUiSlider) {
+                      console.log(`📍 Setting slider to ${timeSeconds}s (${timeStr})`);
+                      window.playbackState.setUpdatingSlider(true);
+                      timelineEl.noUiSlider.set(timeSeconds, false);
+                      window.playbackState.setUpdatingSlider(false);
+                    }
+                    
+                    // Update current time
+                    window.playbackState.setCurrent(timeSeconds);
+                    const currentTimeEl = window.playbackState.currentTimeEl;
+                    if (currentTimeEl) {
+                      currentTimeEl.textContent = window.playbackState.formatTime(timeSeconds);
+                    }
+                    
+                    // Update visualization
+                    if (simulationVisualizer) {
+                      simulationVisualizer.updateVisualization(timeSeconds);
+                    }
+                  }
+                }
+              });
+            }
             // make editable except for id column
-            if (col !== 'id') {
+            else if (col !== 'id') {
               td.contentEditable = 'true';
               // prevent Enter from inserting newlines; treat Enter as commit
               td.addEventListener('keydown', (ev) => {
@@ -625,6 +864,47 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Job Type Settings Manager
   jobTypeSettingsManager = new JobTypeSettingsManager();
 
+  // If a project is pre-selected, update vehicle count UI immediately
+  const initialProject = document.getElementById('project-select') ? document.getElementById('project-select').value : null;
+  if (initialProject) {
+    updateVehicleCountUI(initialProject);
+    updateJobTypeCountUI(initialProject);
+  }
+
+  // Listen for live vehicle updates from VehicleSettingsManager and update UI immediately
+  document.addEventListener('vehicles-updated', (e) => {
+    try {
+      const count = e && e.detail && typeof e.detail.count === 'number' ? e.detail.count : (vehicleSettingsManager && vehicleSettingsManager.vehicleData ? vehicleSettingsManager.vehicleData.length : 0);
+      const display = String(count).padStart(2, '0');
+      document.querySelectorAll('.setting-box').forEach(box => {
+        const label = box.querySelector('.setting-label-small');
+        if (label && label.textContent && label.textContent.trim() === 'Vehicle') {
+          const valEl = box.querySelector('.setting-value');
+          if (valEl) valEl.textContent = display;
+        }
+      });
+    } catch (err) {
+      console.error('vehicles-updated handler error', err);
+    }
+  });
+
+  // Listen for live job type updates and update UI immediately
+  document.addEventListener('jobtypes-updated', (e) => {
+    try {
+      const count = e && e.detail && typeof e.detail.count === 'number' ? e.detail.count : (jobTypeSettingsManager && jobTypeSettingsManager.jobTypeData ? jobTypeSettingsManager.jobTypeData.length : 0);
+      const display = String(count).padStart(2, '0');
+      document.querySelectorAll('.setting-box').forEach(box => {
+        const label = box.querySelector('.setting-label-small');
+        if (label && label.textContent && label.textContent.trim() === 'Job type') {
+          const valEl = box.querySelector('.setting-value');
+          if (valEl) valEl.textContent = display;
+        }
+      });
+    } catch (err) {
+      console.error('jobtypes-updated handler error', err);
+    }
+  });
+
   // wire playback UI and make it follow operating time
   const playToggle = document.getElementById('play-toggle');
   const stopBtn = document.getElementById('stop-btn');
@@ -638,6 +918,39 @@ document.addEventListener('DOMContentLoaded', () => {
   let rafId = null;
   let noui = null;
   let updatingSlider = false; // flag to prevent nouiUpdateHandler from overwriting current during programmatic updates
+  
+  // Function to enable/disable player controls based on simulation result availability
+  function setPlayerControlsEnabled(enabled) {
+    if (playToggle) playToggle.disabled = !enabled;
+    if (stopBtn) stopBtn.disabled = !enabled;
+    if (speedSelect) speedSelect.disabled = !enabled;
+    if (timelineEl) {
+      timelineEl.style.opacity = enabled ? '1' : '0.5';
+      timelineEl.style.pointerEvents = enabled ? 'auto' : 'none';
+    }
+    
+    // If disabling and currently playing, stop playback
+    if (!enabled && playing) {
+      stopPlayback();
+    }
+  }
+  
+  // Expose to global scope for demand table click handler
+  // Use a reference object that contains references to the variables
+  window.playbackState = {
+    playing: () => playing,
+    setPlaying: (v) => { playing = v; },
+    current: () => current,
+    setCurrent: (v) => { current = v; },
+    rafId: () => rafId,
+    setRafId: (v) => { rafId = v; },
+    noui: () => noui,
+    setNoui: (v) => { noui = v; },
+    updatingSlider: () => updatingSlider,
+    setUpdatingSlider: (v) => { updatingSlider = v; },
+    currentTimeEl: null,
+    totalTimeEl: null
+  };
 
   function parseTimeToSeconds(str) {
     if (!str) return NaN;
@@ -673,10 +986,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!playing && !updatingSlider) {
       current = Math.floor(v);
       
-      // Update markers when user drags the timeline (needs to rebuild from scratch)
-      if (demandMarkersManager) {
-        demandMarkersManager.clearAllMarkers();
-        demandMarkersManager.update(current);
+      // Update simulation visualization when user drags the timeline
+      if (simulationVisualizer) {
+        simulationVisualizer.updateVisualization(current);
       }
     }
     if (currentTimeEl) currentTimeEl.textContent = formatTime(current);
@@ -728,15 +1040,32 @@ document.addEventListener('DOMContentLoaded', () => {
     playing = true;
     if (playToggle) playToggle.setAttribute('aria-pressed','true');
     let last = performance.now();
+    let lastRenderTime = 0;
+    
     function loop(now) {
       const dt = (now - last)/1000; last = now;
       const rate = speedSelect ? Number(speedSelect.value) || 1 : 1;
       current += dt * rate;
       const range = getOperatingRange();
       
-      // Update demand markers based on current time
-      if (demandMarkersManager) {
-        demandMarkersManager.update(current);
+      // Adaptive rendering interval based on playback speed
+      // Low speed (1-2x): 30fps (33.33ms)
+      // Medium speed (5-10x): 20fps (50ms)
+      // High speed (20x+): 15fps (66.67ms)
+      let renderInterval = 33.33; // Default: 30fps
+      if (rate >= 20) {
+        renderInterval = 66.67; // 15fps for high speed
+      } else if (rate >= 5) {
+        renderInterval = 50; // 20fps for medium speed
+      }
+      
+      // Update visualization only at specified interval (throttling)
+      const timeSinceLastRender = now - lastRenderTime;
+      if (timeSinceLastRender >= renderInterval) {
+        if (simulationVisualizer) {
+          simulationVisualizer.updateVisualization(current);
+        }
+        lastRenderTime = now;
       }
       
       if (current >= range.endSec) {
@@ -745,6 +1074,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (noui && typeof noui.set === 'function') noui.set(current, false); // don't fire events
         updatingSlider = false;
         if (currentTimeEl) currentTimeEl.textContent = formatTime(current);
+        // Final render at the end
+        if (simulationVisualizer) {
+          simulationVisualizer.updateVisualization(current);
+        }
         stopPlayback();
         return;
       }
@@ -763,8 +1096,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   }
 
+  // Expose functions to global playbackState object
+  window.playbackState.currentTimeEl = currentTimeEl;
+  window.playbackState.totalTimeEl = totalTimeEl;
+  window.playbackState.formatTime = formatTime;
+  window.playbackState.parseTimeToSeconds = parseTimeToSeconds;
+  window.playbackState.getOperatingRange = getOperatingRange;
+  window.playbackState.nouiUpdateHandler = nouiUpdateHandler;
+  window.playbackState.applyOperatingRangeToSlider = applyOperatingRangeToSlider;
+  window.playbackState.startPlayback = startPlayback;
+  window.playbackState.stopPlayback = stopPlayback;
+  window.playbackState.setPlayerControlsEnabled = setPlayerControlsEnabled;
+
   // initialize slider + UI
   applyOperatingRangeToSlider();
+  
+  // Initially disable player controls until simulation result is loaded
+  setPlayerControlsEnabled(false);
 
   if (playToggle) {
     playToggle.addEventListener('click', () => {
@@ -784,9 +1132,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (currentTimeEl) currentTimeEl.textContent = formatTime(current);
       stopPlayback();
       
-      // Clear all demand markers on stop
-      if (demandMarkersManager) {
-        demandMarkersManager.clearAllMarkers();
+      // Reset simulation visualization to start
+      if (simulationVisualizer) {
+        simulationVisualizer.updateVisualization(current);
       }
     });
   }

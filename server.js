@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const multer = require('multer');
 require('dotenv').config();
 
 const tmapRouteService = require('./services/tmapRouteService');
@@ -12,6 +13,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '5mb' }));
 // parse text bodies for CSV uploads
 app.use(express.text({ limit: '5mb' }));
+
+// Setup multer for file uploads (CSV files only, in memory)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only CSV files are allowed'));
+    }
+  },
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
 
 app.get('/config', (req, res) => {
   const token = process.env.MAPBOX_TOKEN || '';
@@ -124,24 +138,51 @@ app.get('/projects/:name/demand', (req, res) => {
 });
 
 // POST demand CSV for a project (save or overwrite demand_data.csv)
-app.post('/projects/:name/demand', (req, res) => {
+// Supports two methods:
+// 1. JSON body with { csv: "csv content" } - saves CSV text directly
+// 2. FormData with file field - uploads and saves CSV file
+app.post('/projects/:name/demand', upload.single('file'), (req, res) => {
   const name = String(req.params.name || '').trim();
   if (!/^[a-zA-Z0-9-_]+$/.test(name)) return res.status(400).json({ error: 'Invalid project name' });
-  const csv = req.body && req.body.csv;
-  if (typeof csv !== 'string') return res.status(400).json({ error: 'Missing csv content' });
+  
   const projectsDir = path.join(__dirname, 'projects');
   const targetDir = path.join(projectsDir, name);
   const fs = require('fs');
+  
+  // Determine CSV content source
+  let csvContent = null;
+  
+  // Priority 1: File upload (FormData)
+  if (req.file) {
+    csvContent = req.file.buffer.toString('utf8');
+  }
+  // Priority 2: JSON body with csv field
+  else if (req.body && req.body.csv && typeof req.body.csv === 'string') {
+    csvContent = req.body.csv;
+  }
+  
+  if (!csvContent) {
+    return res.status(400).json({ error: 'Missing csv content or file' });
+  }
+  
   // ensure project dir exists
   fs.stat(targetDir, (err, stats) => {
     if (err || !stats.isDirectory()) return res.status(404).json({ error: 'Project not found' });
     const filePath = path.join(targetDir, 'demand_data.csv');
-    fs.writeFile(filePath, csv, 'utf8', (err) => {
+    // Add BOM for Excel compatibility
+    const BOM = '\uFEFF';
+    const contentWithBOM = BOM + csvContent;
+    fs.writeFile(filePath, contentWithBOM, 'utf8', (err) => {
       if (err) {
         console.error('Failed to write demand_data.csv', err);
         return res.status(500).json({ error: 'Failed to save csv' });
       }
-      return res.status(201).json({ name, saved: true });
+      // Return success with saved file info
+      return res.status(201).json({ 
+        name, 
+        saved: true,
+        message: 'CSV file saved successfully'
+      });
     });
   });
 });
@@ -161,6 +202,77 @@ app.get('/projects/:name/demand/download', (req, res) => {
         console.error('Download error', err);
         if (!res.headersSent) res.status(500).send('Download failed');
       }
+    });
+  });
+});
+
+// GET simulation result JSON for a project
+app.get('/projects/:name/simulation-result', (req, res) => {
+  const name = String(req.params.name || '').trim();
+  if (!/^[a-zA-Z0-9-_]+$/.test(name)) return res.status(400).json({ error: 'Invalid project name' });
+  const filePath = path.join(__dirname, 'projects', name, 'simulation_result.json');
+  const fs = require('fs');
+  fs.stat(filePath, (err, stats) => {
+    if (err || !stats.isFile()) return res.status(404).json({ error: 'Simulation result not found' });
+    fs.readFile(filePath, 'utf8', (rerr, data) => {
+      if (rerr) return res.status(500).json({ error: 'Failed to read simulation result' });
+      try {
+        const json = JSON.parse(data);
+        return res.json(json);
+      } catch (e) {
+        return res.status(500).json({ error: 'Invalid simulation result format' });
+      }
+    });
+  });
+});
+
+// CHECK if simulation result exists for a project
+app.get('/projects/:name/simulation-result/exists', (req, res) => {
+  const name = String(req.params.name || '').trim();
+  if (!/^[a-zA-Z0-9-_]+$/.test(name)) return res.status(400).json({ error: 'Invalid project name' });
+  const filePath = path.join(__dirname, 'projects', name, 'simulation_result.json');
+  const fs = require('fs');
+  fs.stat(filePath, (err, stats) => {
+    const exists = !err && stats.isFile();
+    res.json({ exists });
+  });
+});
+
+// GET report HTML for a project
+app.get('/projects/:name/report', (req, res) => {
+  const name = String(req.params.name || '').trim();
+  if (!/^[a-zA-Z0-9-_]+$/.test(name)) return res.status(400).json({ error: 'Invalid project name' });
+  const filePath = path.join(__dirname, 'projects', name, 'simulation_report.html');
+  const fs = require('fs');
+  fs.stat(filePath, (err, stats) => {
+    if (err || !stats.isFile()) return res.status(404).json({ error: 'Report not found' });
+    fs.readFile(filePath, 'utf8', (rerr, data) => {
+      if (rerr) return res.status(500).json({ error: 'Failed to read report' });
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.send(data);
+    });
+  });
+});
+
+// POST (save) report HTML for a project
+app.post('/projects/:name/report', (req, res) => {
+  const name = String(req.params.name || '').trim();
+  if (!/^[a-zA-Z0-9-_]+$/.test(name)) return res.status(400).json({ error: 'Invalid project name' });
+  const html = req.body;
+  if (!html || typeof html !== 'string') return res.status(400).json({ error: 'Missing HTML content' });
+  
+  const projectsDir = path.join(__dirname, 'projects');
+  const targetDir = path.join(projectsDir, name);
+  const fs = require('fs');
+  fs.stat(targetDir, (err, stats) => {
+    if (err || !stats.isDirectory()) return res.status(404).json({ error: 'Project not found' });
+    const filePath = path.join(targetDir, 'simulation_report.html');
+    fs.writeFile(filePath, html, 'utf8', (werr) => {
+      if (werr) {
+        console.error('Failed to write report HTML', werr);
+        return res.status(500).json({ error: 'Failed to save report' });
+      }
+      return res.status(201).json({ name, saved: true });
     });
   });
 });
@@ -215,7 +327,11 @@ app.post('/projects/:name/vehicles', (req, res) => {
   
   const fs = require('fs');
   
-  fs.writeFile(filePath, csv, 'utf-8', (err) => {
+  // Add BOM for Excel compatibility
+  const BOM = '\uFEFF';
+  const csvWithBOM = BOM + csv;
+  
+  fs.writeFile(filePath, csvWithBOM, 'utf-8', (err) => {
     if (err) {
       console.error('[POST /projects/:name/vehicles] Write error:', err);
       return res.status(500).json({ error: 'Failed to save vehicles' });
@@ -275,7 +391,11 @@ app.post('/projects/:name/job-types', (req, res) => {
   
   const fs = require('fs');
   
-  fs.writeFile(filePath, csv, 'utf-8', (err) => {
+  // Add BOM for Excel compatibility
+  const BOM = '\uFEFF';
+  const csvWithBOM = BOM + csv;
+  
+  fs.writeFile(filePath, csvWithBOM, 'utf-8', (err) => {
     if (err) {
       console.error('[POST /projects/:name/job-types] Write error:', err);
       return res.status(500).json({ error: 'Failed to save job types' });
@@ -530,6 +650,24 @@ app.get('/api/simulation/run/:projectName', async (req, res) => {
     // Generate result JSON
     sendProgress({ status: 'generating', message: 'Generating result file...' });
     const result = await engine.generateResultJSON();
+    
+    // Delete existing report file if it exists
+    const reportPath = path.join(projectPath, 'simulation_report.html');
+    console.log(`📍 Attempting to delete report at: ${reportPath}`);
+    try {
+      const fileExists = fs.existsSync(reportPath);
+      console.log(`📍 File exists check: ${fileExists}`);
+      
+      if (fileExists) {
+        await fs.promises.unlink(reportPath);
+        console.log(`🗑️  Successfully deleted old report file: ${reportPath}`);
+      } else {
+        console.log(`ℹ️  Report file does not exist (first run): ${reportPath}`);
+      }
+    } catch (err) {
+      console.error(`❌ Error deleting report file: ${err.message}`);
+      console.error(`Error code: ${err.code}, Stack: ${err.stack}`);
+    }
     
     console.log(`✅ Simulation completed for project: ${projectName}\n`);
     

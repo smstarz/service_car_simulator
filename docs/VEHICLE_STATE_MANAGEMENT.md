@@ -49,7 +49,6 @@ IDLE (다시 대기)
   
   // 차량 속성
   job_type: "call",
-  capacity: 4,
   
   // 상태 정보
   state: "idle",  // VehicleState 중 하나

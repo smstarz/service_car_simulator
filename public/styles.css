@@ -104,6 +104,27 @@ html, body {
   box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
 }
 
+/* Disabled state for playback controls */
+#playback-controls .btn-primary:disabled,
+#playback-controls .btn-outline-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  background: rgba(108, 117, 125, 0.1);
+  border-color: rgba(108, 117, 125, 0.2);
+  color: rgba(173, 181, 189, 0.5);
+  box-shadow: none;
+}
+
+#playback-controls .form-select:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: rgba(108, 117, 125, 0.1);
+  border-color: rgba(108, 117, 125, 0.2);
+  color: rgba(173, 181, 189, 0.5);
+}
+
 /* Ensure visible focus for keyboard users */
 .play-btn:focus, .stop-btn:focus, .timeline-slider:focus, .speed-selector:focus {
   outline: 2px solid rgba(13, 110, 253, 0.6);
@@ -270,12 +291,9 @@ html, body {
   transform: scale(1.05);
 }
 
-.timeline-slider .noUi-handle::before {
-  content: '';
-  position: absolute;
-  inset: 1.5px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent 60%);
+.timeline-slider .noUi-handle::before,
+.timeline-slider .noUi-handle::after {
+  display: none !important;
 }
 
 .timeline-slider .noUi-tooltip { display: none; }
@@ -603,6 +621,17 @@ html, body {
   color: #555;
   line-height: 1.1;
   font-size: 8px;
+}
+
+/* Clickable ID column styling */
+.demand-table tbody tr td:first-child {
+  font-weight: 600;
+  color: #0d6efd;
+}
+
+.demand-table tbody tr td:first-child:hover {
+  background: rgba(13, 110, 253, 0.15);
+  text-decoration: underline;
 }
 
 .cell-error {
@@ -1096,5 +1125,19 @@ html, body {
 #cancel-simulation-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ===================================
+   Mapbox Popup Dark Theme Styling
+   =================================== */
+.mapboxgl-popup-content {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.mapboxgl-popup-tip {
+  border-top-color: rgba(30, 35, 50, 0.95) !important;
 }
 

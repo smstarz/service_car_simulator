@@ -1,7 +1,7 @@
 {
   "waitTimeLimit": 10,
   "operatingTime": {
-    "start": "09:00",
-    "end": "15:04"
+    "start": "12:00",
+    "end": "13:30"
   }
 }

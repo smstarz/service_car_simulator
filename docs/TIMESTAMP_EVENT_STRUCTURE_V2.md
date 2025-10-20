@@ -61,7 +61,6 @@
       "name": "Vehicle_1",
       "initialLocation": [126.9780, 37.5665],
       "job_type": "call",
-      "capacity": 4,
       "statistics": {
         "total_jobs": 15,
         "total_distance": 45000,

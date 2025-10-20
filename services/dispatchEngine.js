@@ -103,11 +103,31 @@ class DispatchEngine {
     const outerRing = polygonCoordinates[0];
     
     return vehicles.filter(vehicle => {
-      const vehiclePoint = [vehicle.current_lng, vehicle.current_lat];
+      // 차량 위치 가져오기 (여러 필드명 지원)
+      let lng, lat;
+      
+      if (vehicle.current_lng !== undefined && vehicle.current_lat !== undefined) {
+        // current_lng/current_lat 사용
+        lng = vehicle.current_lng;
+        lat = vehicle.current_lat;
+      } else if (vehicle.location && Array.isArray(vehicle.location) && vehicle.location.length === 2) {
+        // location 배열 사용 [lng, lat]
+        lng = vehicle.location[0];
+        lat = vehicle.location[1];
+      } else if (vehicle.initial_lng !== undefined && vehicle.initial_lat !== undefined) {
+        // initial_lng/initial_lat 사용
+        lng = vehicle.initial_lng;
+        lat = vehicle.initial_lat;
+      } else {
+        console.log(`   ✗ ${vehicle.name}: 위치 정보 없음`);
+        return false;
+      }
+      
+      const vehiclePoint = [lng, lat];
       const isInside = this.isPointInPolygon(vehiclePoint, outerRing);
       
       if (isInside) {
-        console.log(`   ✓ ${vehicle.name}: 폴리곤 내부`);
+        console.log(`   ✓ ${vehicle.name}: 폴리곤 내부 [${lng.toFixed(6)}, ${lat.toFixed(6)}]`);
       }
       
       return isInside;
@@ -147,11 +167,28 @@ class DispatchEngine {
     let minDistance = Infinity;
     
     vehicles.forEach(vehicle => {
+      // 차량 위치 가져오기 (여러 필드명 지원)
+      let lng, lat;
+      
+      if (vehicle.current_lng !== undefined && vehicle.current_lat !== undefined) {
+        lng = vehicle.current_lng;
+        lat = vehicle.current_lat;
+      } else if (vehicle.location && Array.isArray(vehicle.location) && vehicle.location.length === 2) {
+        lng = vehicle.location[0];
+        lat = vehicle.location[1];
+      } else if (vehicle.initial_lng !== undefined && vehicle.initial_lat !== undefined) {
+        lng = vehicle.initial_lng;
+        lat = vehicle.initial_lat;
+      } else {
+        console.log(`   ✗ ${vehicle.name}: 위치 정보 없음`);
+        return;
+      }
+      
       const distance = this.calculateDistance(
         demand.origin_lng,
         demand.origin_lat,
-        vehicle.current_lng,
-        vehicle.current_lat
+        lng,
+        lat
       );
       
       vehicle.distanceToDemand = distance;

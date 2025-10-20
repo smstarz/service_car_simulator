@@ -8,6 +8,25 @@ export class VehicleSettingsManager {
     this.currentProjectName = null;
     this.vehicleData = [];
     this.isModified = false;
+    this._backupVehicleData = null;
+  }
+
+  // helper to emit vehicles-updated event safely
+  emitVehiclesUpdated() {
+    // debounce rapid calls to prevent flooding the main UI
+    try {
+      if (this._emitTimeout) clearTimeout(this._emitTimeout);
+      this._emitTimeout = setTimeout(() => {
+        try {
+          const count = Array.isArray(this.vehicleData) ? this.vehicleData.length : 0;
+          document.dispatchEvent(new CustomEvent('vehicles-updated', { detail: { count, vehicles: this.vehicleData } }));
+        } catch (err) {
+          // ignore
+        }
+      }, 100);
+    } catch (err) {
+      // ignore
+    }
   }
 
   /**
@@ -32,9 +51,12 @@ export class VehicleSettingsManager {
       if (this.vehicleData.length === 0) {
         this.vehicleData = this.getDefaultVehicles();
       }
+  // notify listeners that vehicles have been loaded
+  this.emitVehiclesUpdated();
     } catch (error) {
       console.error('Failed to load vehicles:', error);
       this.vehicleData = this.getDefaultVehicles();
+  this.emitVehiclesUpdated();
     }
   }
 
@@ -216,6 +238,13 @@ export class VehicleSettingsManager {
     const existing = document.getElementById('vehicle-settings-modal');
     if (existing) existing.remove();
 
+    // create a backup copy of current vehicle data so we can restore on cancel
+    try {
+      this._backupVehicleData = JSON.parse(JSON.stringify(this.vehicleData || []));
+    } catch (e) {
+      this._backupVehicleData = (this.vehicleData || []).slice();
+    }
+
     // 새 모달 추가
     const modalHTML = this.createPopupHTML();
     document.body.insertAdjacentHTML('beforeend', modalHTML);
@@ -224,12 +253,28 @@ export class VehicleSettingsManager {
 
     // 이벤트 리스너
     document.getElementById('close-vehicle-modal').addEventListener('click', () => {
-      this.closeModal();
+      if (this.isModified) {
+        if (confirm('You have unsaved changes. Do you want to discard them?')) {
+          // restore backup
+          this.vehicleData = this._backupVehicleData ? JSON.parse(JSON.stringify(this._backupVehicleData)) : (this.getDefaultVehicles() || []);
+          this.isModified = false;
+            this.emitVehiclesUpdated();
+          this.closeModal();
+        }
+      } else {
+        this.closeModal();
+      }
     });
 
     document.getElementById('cancel-vehicle-btn').addEventListener('click', () => {
-      if (this.isModified && !confirm('You have unsaved changes. Do you want to discard them?')) {
-        return;
+      if (this.isModified) {
+        if (!confirm('You have unsaved changes. Do you want to discard them?')) {
+          return;
+        }
+        // restore backup
+        this.vehicleData = this._backupVehicleData ? JSON.parse(JSON.stringify(this._backupVehicleData)) : (this.getDefaultVehicles() || []);
+        this.isModified = false;
+  this.emitVehiclesUpdated();
       }
       this.closeModal();
     });
@@ -268,18 +313,28 @@ export class VehicleSettingsManager {
 
         this.vehicleData[idx][field] = value;
         this.isModified = true;
+    // notify listeners about update
+    this.emitVehiclesUpdated();
       });
 
       input.addEventListener('input', (e) => {
         this.isModified = true;
+        // notify listeners (live update while typing)
+        this.emitVehiclesUpdated();
       });
     });
 
     // 모달 외부 클릭 시 닫기
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
-        if (this.isModified && !confirm('You have unsaved changes. Do you want to discard them?')) {
-          return;
+        if (this.isModified) {
+          if (!confirm('You have unsaved changes. Do you want to discard them?')) {
+            return;
+          }
+          // restore backup
+          this.vehicleData = this._backupVehicleData ? JSON.parse(JSON.stringify(this._backupVehicleData)) : (this.getDefaultVehicles() || []);
+          this.isModified = false;
+          this.emitVehiclesUpdated();
         }
         this.closeModal();
       }
@@ -313,6 +368,7 @@ export class VehicleSettingsManager {
 
     // 테이블 다시 렌더링
     this.updateTableBody();
+  this.emitVehiclesUpdated();
   }
 
   /**
@@ -324,6 +380,7 @@ export class VehicleSettingsManager {
 
     // 테이블 다시 렌더링
     this.updateTableBody();
+  this.emitVehiclesUpdated();
   }
 
   /**
@@ -386,7 +443,7 @@ export class VehicleSettingsManager {
 
     // 차량 수 업데이트
     const info = document.querySelector('.vehicle-info');
-    if (info) {
+  if (info) {
       info.innerHTML = `
         <span>Total Vehicles: <strong>${vehicleCount}</strong></span>
         <button id="add-vehicle-btn" class="btn btn-primary btn-small">
@@ -397,5 +454,7 @@ export class VehicleSettingsManager {
         this.addVehicle();
       });
     }
+    // dispatch update event for any external UI
+    this.emitVehiclesUpdated();
   }
 }

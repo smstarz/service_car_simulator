@@ -11,6 +11,8 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" rel="stylesheet" />
   <!-- noUiSlider CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -42,11 +44,20 @@
         <option value="1">x1.0</option>
         <option value="2">x2.0</option>
         <option value="5">x5.0</option>
+        <option value="10">x10</option>
+        <option value="20">x20</option>
+        <option value="50">x50</option>
       </select>
 
       <button id="stop-btn" class="btn btn-outline-secondary ms-2" aria-label="Stop">
         <i class="fas fa-stop"></i>
       </button>
+
+      <!-- Show Address Label Toggle -->
+      <label style="font-size:12px; display:flex; align-items:center; gap:8px; cursor:pointer; margin-left:16px; color:#e0e7ff;">
+        <input type="checkbox" id="toggle-show-address" style="cursor:pointer;" />
+        <span style="white-space:nowrap;">Show address</span>
+      </label>
     </div>
 
     <!-- Bottom Panel: 1800px x 500px -->
@@ -113,6 +124,7 @@
         </div>
         <div class="table-actions">
           <button id="download-form" class="btn btn-action">Download Form</button>
+          <button id="create-report" class="btn btn-action">Create Report</button>
           <button id="upload-csv" class="btn btn-action">Upload CSV</button>
           <button id="download-csv" class="btn btn-action">Download CSV</button>
         </div>

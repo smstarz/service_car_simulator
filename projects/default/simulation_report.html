@@ -1,0 +1,1041 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulation Report - default</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px 8px 0 0;
+    }
+    
+    .header h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    
+    .header .meta {
+      font-size: 12px;
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+    
+    .tabs {
+      display: flex;
+      background: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: #6c757d;
+      transition: all 0.3s;
+    }
+    
+    .tab:hover {
+      background: #e9ecef;
+    }
+    
+    .tab.active {
+      color: #667eea;
+      border-bottom: 3px solid #667eea;
+      background: white;
+    }
+    
+    .tab-content {
+      padding: 20px;
+    }
+    
+    .tab-pane {
+      display: none;
+    }
+    
+    .tab-pane.active {
+      display: block;
+    }
+    
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .card:nth-child(2) {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .card:nth-child(3) {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .card:nth-child(4) {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .card-title {
+      font-size: 11px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    
+    .card-value {
+      font-size: 22px;
+      font-weight: bold;
+    }
+    
+    .card-unit {
+      font-size: 11px;
+      opacity: 0.9;
+      margin-left: 3px;
+    }
+    
+    .chart-section {
+      margin-bottom: 20px;
+    }
+    
+    .chart-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e9ecef;
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 250px;
+      background: white;
+      padding: 8px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      width: 100%;
+    }
+    
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+    
+    @media print {
+      body {
+        background: white;
+      }
+      
+      .container {
+        box-shadow: none;
+      }
+      
+      .chart-container {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📊 Simulation Report</h1>
+      <div class="meta">
+        <div>Project: default</div>
+        <div>Generated: 2025. 10. 20. 오후 3:55:46</div>
+        <div>Simulation Period: 13:00 ~ 19:00</div>
+      </div>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab active" data-tab="vehicle">Vehicle Analysis</button>
+      <button class="tab" data-tab="demand">Demand Analysis</button>
+    </div>
+    
+    <div class="tab-content">
+      <!-- Vehicle Tab -->
+      <div id="vehicle-tab" class="tab-pane active">
+        <div class="summary-cards">
+          <div class="card">
+            <div class="card-title">Total Vehicles</div>
+            <div class="card-value">10<span class="card-unit">units</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Total Jobs</div>
+            <div class="card-value">140<span class="card-unit">jobs</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Total Distance</div>
+            <div class="card-value">237.54<span class="card-unit">km</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Total Moving Time</div>
+            <div class="card-value">1185.3<span class="card-unit">min</span></div>
+          </div>
+        </div>
+        
+        <div class="chart-section">
+          <div class="chart-title">📈 Vehicle Performance Metrics</div>
+          <div class="chart-grid">
+            <div class="chart-container">
+              <canvas id="chart-jobs"></canvas>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-distance"></canvas>
+            </div>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-container">
+              <canvas id="chart-idle"></canvas>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-utilization"></canvas>
+            </div>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-container">
+              <canvas id="chart-avg-distance"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Demand Tab -->
+      <div id="demand-tab" class="tab-pane">
+        <div class="summary-cards">
+          <div class="card">
+            <div class="card-title">Total Demands</div>
+            <div class="card-value"><span id="total-demands">0</span><span class="card-unit">demands</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Completed</div>
+            <div class="card-value"><span id="completed-demands">0</span><span class="card-unit">demands</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Rejected</div>
+            <div class="card-value"><span id="rejected-demands">0</span><span class="card-unit">demands</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Completion Rate</div>
+            <div class="card-value"><span id="completion-rate">0</span><span class="card-unit">%</span></div>
+          </div>
+        </div>
+        
+        <div class="chart-section">
+          <div class="chart-title">📈 Demand Analysis</div>
+          <div class="chart-grid">
+            <div class="chart-container">
+              <canvas id="chart-demand-distance"></canvas>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-demand-wait-time"></canvas>
+            </div>
+          </div>
+          <div class="chart-grid" style="grid-template-columns: 1fr;">
+            <div class="chart-container">
+              <canvas id="chart-demand-hourly"></canvas>
+            </div>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-container">
+              <canvas id="chart-job-type"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    
+    window.vehicleChartData = [{"name":"vehicle_01","totalJobs":14,"totalDistance":23.625999999999998,"idleTime":107.15,"utilizationRate":"70.2","avgDistancePerJob":"1.69"},{"name":"vehicle_02","totalJobs":14,"totalDistance":25.177999999999997,"idleTime":101.15,"utilizationRate":"71.9","avgDistancePerJob":"1.80"},{"name":"vehicle_03","totalJobs":13,"totalDistance":25.154000000000003,"idleTime":117.9,"utilizationRate":"67.3","avgDistancePerJob":"1.93"},{"name":"vehicle_04","totalJobs":14,"totalDistance":22.66,"idleTime":87.16666666666667,"utilizationRate":"75.8","avgDistancePerJob":"1.62"},{"name":"vehicle_05","totalJobs":12,"totalDistance":22.582,"idleTime":112.5,"utilizationRate":"68.8","avgDistancePerJob":"1.88"},{"name":"vehicle_06","totalJobs":14,"totalDistance":26.223,"idleTime":77.25,"utilizationRate":"78.5","avgDistancePerJob":"1.87"},{"name":"vehicle_07","totalJobs":13,"totalDistance":23.672000000000004,"idleTime":120.1,"utilizationRate":"66.6","avgDistancePerJob":"1.82"},{"name":"vehicle_08","totalJobs":17,"totalDistance":16.947000000000003,"idleTime":112.08333333333333,"utilizationRate":"68.9","avgDistancePerJob":"1.00"},{"name":"vehicle_09","totalJobs":14,"totalDistance":24.374,"idleTime":93.05,"utilizationRate":"74.2","avgDistancePerJob":"1.74"},{"name":"vehicle_10","totalJobs":15,"totalDistance":27.127000000000002,"idleTime":86.33333333333333,"utilizationRate":"76.0","avgDistancePerJob":"1.81"}];
+    window.demandStats = {"summary":{"totalDemands":200,"completedDemands":140,"rejectedDemands":60,"completionRate":"70.0"},"distanceStats":[{"id":"DM0066","distance":0.208},{"id":"DM0048","distance":0.112},{"id":"DM0067","distance":0.866},{"id":"DM0157","distance":1.821},{"id":"DM0130","distance":7.053},{"id":"DM0035","distance":0.709},{"id":"DM0120","distance":0.733},{"id":"DM0176","distance":1.955},{"id":"DM0178","distance":0.162},{"id":"DM0017","distance":1.8},{"id":"DM0049","distance":2.245},{"id":"DM0144","distance":0.471},{"id":"DM0081","distance":1.226},{"id":"DM0007","distance":0.893},{"id":"DM0012","distance":2.414},{"id":"DM0177","distance":1.095},{"id":"DM0051","distance":1.402},{"id":"DM0137","distance":0.653},{"id":"DM0059","distance":0.446},{"id":"DM0041","distance":2.1},{"id":"DM0014","distance":2.24},{"id":"DM0136","distance":1.231},{"id":"DM0052","distance":0.763},{"id":"DM0026","distance":0.444},{"id":"DM0094","distance":0.954},{"id":"DM0042","distance":0.662},{"id":"DM0135","distance":3.659},{"id":"DM0005","distance":3.622},{"id":"DM0139","distance":2.031},{"id":"DM0086","distance":1.483},{"id":"DM0167","distance":1.326},{"id":"DM0043","distance":3.654},{"id":"DM0110","distance":3.233},{"id":"DM0033","distance":1.293},{"id":"DM0088","distance":3.858},{"id":"DM0131","distance":2.427},{"id":"DM0053","distance":0.719},{"id":"DM0162","distance":1.692},{"id":"DM0003","distance":0.716},{"id":"DM0164","distance":2.385},{"id":"DM0161","distance":0.139},{"id":"DM0192","distance":0.773},{"id":"DM0153","distance":0.235},{"id":"DM0013","distance":1.899},{"id":"DM0096","distance":0.776},{"id":"DM0079","distance":1.532},{"id":"DM0102","distance":2.134},{"id":"DM0107","distance":0.628},{"id":"DM0078","distance":2.904},{"id":"DM0091","distance":1.362},{"id":"DM0076","distance":3.227},{"id":"DM0104","distance":0.856},{"id":"DM0156","distance":0.301},{"id":"DM0200","distance":0.888},{"id":"DM0084","distance":1.028},{"id":"DM0151","distance":0.977},{"id":"DM0011","distance":3.112},{"id":"DM0150","distance":1.284},{"id":"DM0038","distance":1.225},{"id":"DM0152","distance":2.459},{"id":"DM0018","distance":1.015},{"id":"DM0006","distance":3.398},{"id":"DM0138","distance":1.938},{"id":"DM0019","distance":2.776},{"id":"DM0064","distance":1.978},{"id":"DM0073","distance":1.993},{"id":"DM0106","distance":1.462},{"id":"DM0194","distance":4.888},{"id":"DM0132","distance":2.296},{"id":"DM0101","distance":2.814},{"id":"DM0127","distance":1.43},{"id":"DM0098","distance":1.759},{"id":"DM0029","distance":0.677},{"id":"DM0099","distance":0.532},{"id":"DM0188","distance":2.129},{"id":"DM0010","distance":0.626},{"id":"DM0097","distance":2.804},{"id":"DM0092","distance":2.918},{"id":"DM0031","distance":0.604},{"id":"DM0027","distance":1.103},{"id":"DM0008","distance":0.793},{"id":"DM0030","distance":2.865},{"id":"DM0068","distance":1.929},{"id":"DM0196","distance":1.519},{"id":"DM0122","distance":0.895},{"id":"DM0112","distance":0.584},{"id":"DM0179","distance":0.906},{"id":"DM0009","distance":1.756},{"id":"DM0146","distance":1.06},{"id":"DM0050","distance":1.526},{"id":"DM0044","distance":0.853},{"id":"DM0111","distance":2.937},{"id":"DM0117","distance":2.163},{"id":"DM0133","distance":1.236},{"id":"DM0168","distance":1.188},{"id":"DM0087","distance":0.594},{"id":"DM0191","distance":2.315},{"id":"DM0022","distance":2.313},{"id":"DM0141","distance":1.399},{"id":"DM0047","distance":2.276},{"id":"DM0149","distance":2.576},{"id":"DM0077","distance":1.823},{"id":"DM0025","distance":2.497},{"id":"DM0172","distance":0.579},{"id":"DM0197","distance":0.485},{"id":"DM0063","distance":1.834},{"id":"DM0100","distance":0.483},{"id":"DM0056","distance":1.729},{"id":"DM0147","distance":1.022},{"id":"DM0193","distance":1.281},{"id":"DM0075","distance":0.316},{"id":"DM0125","distance":2.032},{"id":"DM0108","distance":1.521},{"id":"DM0054","distance":1.948},{"id":"DM0070","distance":1.301},{"id":"DM0140","distance":3.222},{"id":"DM0134","distance":2.738},{"id":"DM0061","distance":2.409},{"id":"DM0002","distance":1.838},{"id":"DM0093","distance":1.858},{"id":"DM0037","distance":1.513},{"id":"DM0062","distance":2.961},{"id":"DM0021","distance":1.483},{"id":"DM0171","distance":2.416},{"id":"DM0090","distance":1.925},{"id":"DM0173","distance":2.817},{"id":"DM0004","distance":1.069},{"id":"DM0174","distance":4.59},{"id":"DM0190","distance":3.019},{"id":"DM0118","distance":1.321},{"id":"DM0129","distance":2.583},{"id":"DM0045","distance":1.295},{"id":"DM0114","distance":1.627},{"id":"DM0170","distance":1.188},{"id":"DM0145","distance":1.408},{"id":"DM0095","distance":3.518},{"id":"DM0082","distance":1.78},{"id":"DM0036","distance":1.569},{"id":"DM0032","distance":0.625},{"id":"DM0183","distance":0.602}],"waitTimeStats":[{"id":"DM0066","waitTime":0.95},{"id":"DM0048","waitTime":0.2},{"id":"DM0067","waitTime":4},{"id":"DM0157","waitTime":7.566666666666666},{"id":"DM0130","waitTime":26.583333333333332},{"id":"DM0035","waitTime":5.15},{"id":"DM0120","waitTime":3.3333333333333335},{"id":"DM0176","waitTime":11.383333333333333},{"id":"DM0178","waitTime":1.2666666666666666},{"id":"DM0017","waitTime":9.116666666666667},{"id":"DM0049","waitTime":13.333333333333334},{"id":"DM0144","waitTime":0.95},{"id":"DM0081","waitTime":3.6},{"id":"DM0007","waitTime":4.016666666666667},{"id":"DM0012","waitTime":13.466666666666667},{"id":"DM0177","waitTime":4.866666666666666},{"id":"DM0051","waitTime":4.633333333333334},{"id":"DM0137","waitTime":3.4166666666666665},{"id":"DM0059","waitTime":1.1333333333333333},{"id":"DM0041","waitTime":10.5},{"id":"DM0014","waitTime":9.05},{"id":"DM0136","waitTime":5.666666666666667},{"id":"DM0052","waitTime":1.4666666666666666},{"id":"DM0026","waitTime":0.8666666666666667},{"id":"DM0094","waitTime":6.85},{"id":"DM0042","waitTime":2.3333333333333335},{"id":"DM0135","waitTime":19.283333333333335},{"id":"DM0005","waitTime":9.9},{"id":"DM0139","waitTime":10.233333333333333},{"id":"DM0086","waitTime":15.716666666666667},{"id":"DM0167","waitTime":4.383333333333334},{"id":"DM0043","waitTime":12.5},{"id":"DM0110","waitTime":9.816666666666666},{"id":"DM0033","waitTime":8},{"id":"DM0088","waitTime":22.583333333333332},{"id":"DM0131","waitTime":10.416666666666666},{"id":"DM0053","waitTime":2.966666666666667},{"id":"DM0162","waitTime":14.516666666666667},{"id":"DM0003","waitTime":2.466666666666667},{"id":"DM0164","waitTime":17.233333333333334},{"id":"DM0161","waitTime":0.43333333333333335},{"id":"DM0192","waitTime":3.2666666666666666},{"id":"DM0153","waitTime":0.26666666666666666},{"id":"DM0013","waitTime":8.416666666666666},{"id":"DM0096","waitTime":1.5333333333333334},{"id":"DM0079","waitTime":5.183333333333334},{"id":"DM0102","waitTime":17.1},{"id":"DM0107","waitTime":1.1833333333333333},{"id":"DM0078","waitTime":12.05},{"id":"DM0091","waitTime":5.616666666666666},{"id":"DM0076","waitTime":16.783333333333335},{"id":"DM0104","waitTime":1.55},{"id":"DM0156","waitTime":0.4166666666666667},{"id":"DM0200","waitTime":5.483333333333333},{"id":"DM0084","waitTime":3.5833333333333335},{"id":"DM0151","waitTime":4.1},{"id":"DM0011","waitTime":16.216666666666665},{"id":"DM0150","waitTime":10.6},{"id":"DM0038","waitTime":6.933333333333334},{"id":"DM0152","waitTime":15.15},{"id":"DM0018","waitTime":4.233333333333333},{"id":"DM0006","waitTime":10.866666666666667},{"id":"DM0138","waitTime":13.033333333333333},{"id":"DM0019","waitTime":14.85},{"id":"DM0064","waitTime":8.866666666666667},{"id":"DM0073","waitTime":8.266666666666667},{"id":"DM0106","waitTime":7.6},{"id":"DM0194","waitTime":18.783333333333335},{"id":"DM0132","waitTime":13.633333333333333},{"id":"DM0101","waitTime":15.866666666666667},{"id":"DM0127","waitTime":7.333333333333333},{"id":"DM0098","waitTime":11.233333333333333},{"id":"DM0029","waitTime":2.85},{"id":"DM0099","waitTime":2.8833333333333333},{"id":"DM0188","waitTime":13.8},{"id":"DM0010","waitTime":2.4833333333333334},{"id":"DM0097","waitTime":21.383333333333333},{"id":"DM0092","waitTime":15.483333333333333},{"id":"DM0031","waitTime":2.3333333333333335},{"id":"DM0027","waitTime":4.183333333333334},{"id":"DM0008","waitTime":5.366666666666666},{"id":"DM0030","waitTime":17.85},{"id":"DM0068","waitTime":7.6},{"id":"DM0196","waitTime":4.333333333333333},{"id":"DM0122","waitTime":5.583333333333333},{"id":"DM0112","waitTime":2.466666666666667},{"id":"DM0179","waitTime":1.8},{"id":"DM0009","waitTime":8.716666666666667},{"id":"DM0146","waitTime":6.75},{"id":"DM0050","waitTime":5.283333333333333},{"id":"DM0044","waitTime":1.5166666666666666},{"id":"DM0111","waitTime":13.866666666666667},{"id":"DM0117","waitTime":14.2},{"id":"DM0133","waitTime":11.183333333333334},{"id":"DM0168","waitTime":4.833333333333333},{"id":"DM0087","waitTime":2.6333333333333333},{"id":"DM0191","waitTime":11.783333333333333},{"id":"DM0022","waitTime":11.05},{"id":"DM0141","waitTime":4.666666666666667},{"id":"DM0047","waitTime":14.5},{"id":"DM0149","waitTime":17.516666666666666},{"id":"DM0077","waitTime":9.25},{"id":"DM0025","waitTime":16.883333333333333},{"id":"DM0172","waitTime":1.05},{"id":"DM0197","waitTime":1.5333333333333334},{"id":"DM0063","waitTime":9.416666666666666},{"id":"DM0100","waitTime":1.9333333333333333},{"id":"DM0056","waitTime":9.983333333333333},{"id":"DM0147","waitTime":5.9},{"id":"DM0193","waitTime":7.35},{"id":"DM0075","waitTime":0.6},{"id":"DM0125","waitTime":10.133333333333333},{"id":"DM0108","waitTime":13.166666666666666},{"id":"DM0054","waitTime":7.816666666666666},{"id":"DM0070","waitTime":5.416666666666667},{"id":"DM0140","waitTime":19.25},{"id":"DM0134","waitTime":11.816666666666666},{"id":"DM0061","waitTime":10.45},{"id":"DM0002","waitTime":6.7},{"id":"DM0093","waitTime":7.133333333333334},{"id":"DM0037","waitTime":9.933333333333334},{"id":"DM0062","waitTime":17.916666666666668},{"id":"DM0021","waitTime":7.233333333333333},{"id":"DM0171","waitTime":8.116666666666667},{"id":"DM0090","waitTime":7.783333333333333},{"id":"DM0173","waitTime":12.633333333333333},{"id":"DM0004","waitTime":4.983333333333333},{"id":"DM0174","waitTime":24.966666666666665},{"id":"DM0190","waitTime":17.2},{"id":"DM0118","waitTime":6.983333333333333},{"id":"DM0129","waitTime":13.983333333333333},{"id":"DM0045","waitTime":8.133333333333333},{"id":"DM0114","waitTime":5.866666666666666},{"id":"DM0170","waitTime":5.65},{"id":"DM0145","waitTime":9.1},{"id":"DM0095","waitTime":23.583333333333332},{"id":"DM0082","waitTime":7.833333333333333},{"id":"DM0036","waitTime":6.183333333333334},{"id":"DM0032","waitTime":2.2333333333333334},{"id":"DM0183","waitTime":4.166666666666667}],"timeSlots":{"0":0,"10":3,"20":4,"30":6,"40":6,"50":6,"60":3,"70":5,"80":4,"90":6,"100":4,"110":5,"120":4,"130":4,"140":1,"150":6,"160":6,"170":3,"180":3,"190":7,"200":5,"210":4,"220":5,"230":5,"240":5,"250":5,"260":4,"270":5,"280":4,"290":5,"300":4,"310":3,"320":0,"330":0,"340":0,"350":0},"jobTypeStats":{"normal":{"total":200,"completed":140}}};
+    
+    
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and panes
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding pane
+        tab.classList.add('active');
+        const tabName = tab.dataset.tab;
+        document.getElementById(tabName + '-tab').classList.add('active');
+      });
+    });
+    
+    // 페이지 로드 시 차트 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOMContentLoaded - vehicleChartData:', window.vehicleChartData);
+      console.log('DOMContentLoaded - demandStats:', window.demandStats);
+      
+      if (window.vehicleChartData && window.Chart) {
+        initializeAllCharts();
+      }
+      if (window.demandStats && window.Chart) {
+        initializeDemandCharts();
+      } else {
+        console.warn('demandStats or Chart not available');
+      }
+    });
+    
+    // 차트 초기화 함수
+    function initializeAllCharts() {
+      if (!window.vehicleChartData || window.vehicleChartData.length === 0) {
+        console.error('No vehicle data available');
+        return;
+      }
+      
+      const vehicleNames = window.vehicleChartData.map(v => v.name);
+      const Chart = window.Chart;
+      
+      // Helper function to calculate average
+      function getAverage(data) {
+        return data.reduce((a, b) => a + b, 0) / data.length;
+      }
+
+      // Helper function to format average label
+      function formatAvgLabel(avg) {
+        return 'Avg: ' + avg.toFixed(2);
+      }
+
+      // Plugin to draw average line
+      const averageLinePlugin = {
+        id: 'averageLine',
+        afterDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          const yScale = chart.scales.y;
+          const xScale = chart.scales.x;
+          
+          if (!chart.avgData) return;
+          
+          const avgValue = chart.avgData.value;
+          const avgLabel = chart.avgData.label;
+          const avgColor = 'rgb(192, 0, 0)'; // Red color
+          
+          const yPixel = yScale.getPixelForValue(avgValue);
+          
+          // Draw dashed line
+          ctx.strokeStyle = avgColor;
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 5]);
+          ctx.beginPath();
+          ctx.moveTo(xScale.left, yPixel);
+          ctx.lineTo(xScale.right, yPixel);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          
+          // Draw average label with white border
+          ctx.font = 'bold 10px Arial';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'top';
+          const textX = xScale.right - 5;
+          const textY = yPixel - 20; // Moved up more
+          const padding = 3;
+          
+          // Draw white border
+          ctx.strokeStyle = 'white';
+          ctx.lineWidth = 1;
+          ctx.strokeText(avgLabel, textX - padding, textY + padding);
+          
+          // Draw text with red color
+          ctx.fillStyle = avgColor;
+          ctx.fillText(avgLabel, textX - padding, textY + padding);
+        }
+      };
+
+      // Chart 1: Jobs per Vehicle
+      const ctxJobs = document.getElementById('chart-jobs');
+      if (ctxJobs) {
+        const jobsData = window.vehicleChartData.map(v => v.totalJobs);
+        const jobsAvg = getAverage(jobsData);
+        
+        const chartJobs = new Chart(ctxJobs, {
+          type: 'bar',
+          data: {
+            labels: vehicleNames,
+            datasets: [{
+              label: 'Jobs Completed',
+              data: jobsData,
+              backgroundColor: 'rgba(102, 126, 234, 0.8)',
+              borderColor: 'rgba(102, 126, 234, 1)',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Jobs Completed by Vehicle',
+                font: { size: 11, weight: 'bold' }
+              },
+              legend: {
+                display: false,
+                labels: { font: { size: 9 } }
+              }
+            },
+            scales: {
+              x: {
+                ticks: {
+                  font: { size: 9 }
+                }
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1,
+                  font: { size: 9 }
+                }
+              }
+            }
+          },
+          plugins: [averageLinePlugin]
+        });
+        
+        chartJobs.avgData = {
+          value: jobsAvg,
+          color: 'rgb(192, 0, 0)',
+          label: formatAvgLabel(jobsAvg)
+        };
+        chartJobs.update('none');
+      }
+      
+      // Chart 2: Distance per Vehicle
+      const ctxDistance = document.getElementById('chart-distance');
+      if (ctxDistance) {
+        const distanceData = window.vehicleChartData.map(v => v.totalDistance);
+        const distanceAvg = getAverage(distanceData);
+        
+        const chartDistance = new Chart(ctxDistance, {
+          type: 'bar',
+          data: {
+            labels: vehicleNames,
+            datasets: [{
+              label: 'Distance (km)',
+              data: distanceData,
+              backgroundColor: 'rgba(240, 147, 251, 0.8)',
+              borderColor: 'rgba(240, 147, 251, 1)',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Total Distance Traveled by Vehicle',
+                font: { size: 11, weight: 'bold' }
+              },
+              legend: {
+                display: false,
+                labels: { font: { size: 9 } }
+              }
+            },
+            scales: {
+              x: {
+                ticks: {
+                  font: { size: 9 }
+                }
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  font: { size: 9 }
+                }
+              }
+            }
+          },
+          plugins: [averageLinePlugin]
+        });
+        
+        chartDistance.avgData = {
+          value: distanceAvg,
+          color: 'rgb(192, 0, 0)',
+          label: formatAvgLabel(distanceAvg)
+        };
+        chartDistance.update('none');
+      }
+      
+      // Chart 3: Idle Time per Vehicle
+      const ctxIdle = document.getElementById('chart-idle');
+      if (ctxIdle) {
+        const idleData = window.vehicleChartData.map(v => v.idleTime);
+        const idleAvg = getAverage(idleData);
+        
+        const chartIdle = new Chart(ctxIdle, {
+          type: 'bar',
+          data: {
+            labels: vehicleNames,
+            datasets: [{
+              label: 'Idle Time (min)',
+              data: idleData,
+              backgroundColor: 'rgba(79, 172, 254, 0.8)',
+              borderColor: 'rgba(79, 172, 254, 1)',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Idle Time by Vehicle',
+                font: { size: 11, weight: 'bold' }
+              },
+              legend: {
+                display: false,
+                labels: { font: { size: 9 } }
+              }
+            },
+            scales: {
+              x: {
+                ticks: {
+                  font: { size: 9 }
+                }
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  font: { size: 9 }
+                }
+              }
+            }
+          },
+          plugins: [averageLinePlugin]
+        });
+        
+        chartIdle.avgData = {
+          value: idleAvg,
+          color: 'rgb(192, 0, 0)',
+          label: formatAvgLabel(idleAvg)
+        };
+        chartIdle.update('none');
+      }
+      
+      // Chart 4: Utilization Rate per Vehicle
+      const ctxUtilization = document.getElementById('chart-utilization');
+      if (ctxUtilization) {
+        const utilizationData = window.vehicleChartData.map(v => parseFloat(v.utilizationRate));
+        const utilizationAvg = getAverage(utilizationData);
+        
+        const chartUtilization = new Chart(ctxUtilization, {
+          type: 'bar',
+          data: {
+            labels: vehicleNames,
+            datasets: [{
+              label: 'Utilization Rate (%)',
+              data: utilizationData,
+              backgroundColor: 'rgba(67, 233, 123, 0.8)',
+              borderColor: 'rgba(67, 233, 123, 1)',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Vehicle Utilization Rate',
+                font: { size: 11, weight: 'bold' }
+              },
+              legend: {
+                display: false,
+                labels: { font: { size: 9 } }
+              }
+            },
+            scales: {
+              x: {
+                ticks: {
+                  font: { size: 9 }
+                }
+              },
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  font: { size: 9 },
+                  callback: function(value) {
+                    return value + '%';
+                  }
+                }
+              }
+            }
+          },
+          plugins: [averageLinePlugin]
+        });
+        
+        chartUtilization.avgData = {
+          value: utilizationAvg,
+          color: 'rgb(192, 0, 0)',
+          label: formatAvgLabel(utilizationAvg)
+        };
+        chartUtilization.update('none');
+      }
+      
+      // Chart 5: Average Distance per Job
+      const ctxAvgDistance = document.getElementById('chart-avg-distance');
+      if (ctxAvgDistance) {
+        const avgDistanceData = window.vehicleChartData.map(v => parseFloat(v.avgDistancePerJob));
+        const avgDistanceAvg = getAverage(avgDistanceData);
+        
+        const chartAvgDistance = new Chart(ctxAvgDistance, {
+          type: 'bar',
+          data: {
+            labels: vehicleNames,
+            datasets: [{
+              label: 'Avg Distance per Job (km)',
+              data: avgDistanceData,
+              backgroundColor: 'rgba(255, 99, 132, 0.8)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Average Distance per Job by Vehicle',
+                font: { size: 11, weight: 'bold' }
+              },
+              legend: {
+                display: false,
+                labels: { font: { size: 9 } }
+              }
+            },
+            scales: {
+              x: {
+                ticks: {
+                  font: { size: 9 }
+                }
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  font: { size: 9 }
+                }
+              }
+            }
+          },
+          plugins: [averageLinePlugin]
+        });
+        
+        chartAvgDistance.avgData = {
+          value: avgDistanceAvg,
+          color: 'rgb(192, 0, 0)',
+          label: formatAvgLabel(avgDistanceAvg)
+        };
+        chartAvgDistance.update('none');
+      }
+    }
+    
+    // Initialize demand charts
+    function initializeDemandCharts() {
+      if (!window.demandStats) {
+        console.error('No demand data available');
+        return;
+      }
+      
+      const stats = window.demandStats;
+      const Chart = window.Chart;
+      
+      console.log('Initializing demand charts with stats:', stats);
+      
+      // Plugin to draw average line (same as vehicle charts)
+      const averageLinePlugin = {
+        id: 'averageLine',
+        afterDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          const yScale = chart.scales.y;
+          const xScale = chart.scales.x;
+          
+          if (!chart.avgData) return;
+          
+          const avgValue = chart.avgData.value;
+          const avgLabel = chart.avgData.label;
+          const avgColor = 'rgb(192, 0, 0)'; // Red color
+          
+          const yPixel = yScale.getPixelForValue(avgValue);
+          
+          // Draw dashed line
+          ctx.strokeStyle = avgColor;
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 5]);
+          ctx.beginPath();
+          ctx.moveTo(xScale.left, yPixel);
+          ctx.lineTo(xScale.right, yPixel);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          
+          // Draw average label with white border
+          ctx.font = 'bold 10px Arial';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'top';
+          const textX = xScale.right - 5;
+          const textY = yPixel - 20;
+          const padding = 3;
+          
+          // Draw white border
+          ctx.strokeStyle = 'white';
+          ctx.lineWidth = 1;
+          ctx.strokeText(avgLabel, textX - padding, textY + padding);
+          
+          // Draw text with red color
+          ctx.fillStyle = avgColor;
+          ctx.fillText(avgLabel, textX - padding, textY + padding);
+        }
+      };
+      
+      // Update summary cards
+      try {
+        document.getElementById('total-demands').textContent = stats.summary.totalDemands;
+        document.getElementById('completed-demands').textContent = stats.summary.completedDemands;
+        document.getElementById('rejected-demands').textContent = stats.summary.rejectedDemands;
+        document.getElementById('completion-rate').textContent = stats.summary.completionRate;
+        console.log('Summary cards updated successfully');
+      } catch (error) {
+        console.error('Error updating summary cards:', error);
+      }
+      
+      // Chart 1: Demand Distance Distribution
+      const ctxDemandDistance = document.getElementById('chart-demand-distance');
+      if (ctxDemandDistance && stats.distanceStats && stats.distanceStats.length > 0) {
+        try {
+          const sortedStats = stats.distanceStats.sort((a, b) => a.distance - b.distance);
+          const distances = sortedStats.map(d => d.distance);
+          const avgDistance = distances.reduce((a, b) => a + b, 0) / distances.length;
+          
+          const chartDistanceInstance = new Chart(ctxDemandDistance, {
+            type: 'bar',
+            data: {
+              labels: sortedStats.map(d => d.id),
+              datasets: [{
+                label: 'Distance (km)',
+                data: distances,
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              indexAxis: 'x',
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Distance per Demand',
+                  font: { size: 11, weight: 'bold' }
+                },
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    title: function(context) {
+                      return 'Demand ID: ' + context[0].label;
+                    },
+                    label: function(context) {
+                      return 'Distance: ' + context.parsed.y.toFixed(2) + ' km';
+                    }
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    font: { size: 8 },
+                    maxRotation: 45
+                  }
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    font: { size: 9 }
+                  },
+                  title: {
+                    display: true,
+                    text: 'Distance (km)',
+                    font: { size: 9 }
+                  }
+                }
+              }
+            },
+            plugins: [averageLinePlugin]
+          });
+          
+          chartDistanceInstance.avgData = {
+            value: avgDistance,
+            color: 'rgb(192, 0, 0)',
+            label: 'Avg: ' + avgDistance.toFixed(2)
+          };
+          chartDistanceInstance.update('none');
+          console.log('Distance chart created');
+        } catch (error) {
+          console.error('Error creating distance chart:', error);
+        }
+      } else {
+        console.warn('No distance stats available or container not found');
+      }
+      
+      // Chart 2: Wait Time Distribution
+      const ctxWaitTime = document.getElementById('chart-demand-wait-time');
+      if (ctxWaitTime && stats.waitTimeStats && stats.waitTimeStats.length > 0) {
+        try {
+          const sortedStats = stats.waitTimeStats.sort((a, b) => a.waitTime - b.waitTime);
+          const waitTimes = sortedStats.map(d => d.waitTime);
+          const avgWaitTime = waitTimes.reduce((a, b) => a + b, 0) / waitTimes.length;
+          
+          const chartWaitTimeInstance = new Chart(ctxWaitTime, {
+            type: 'bar',
+            data: {
+              labels: sortedStats.map(d => d.id),
+              datasets: [{
+                label: 'Wait Time (min)',
+                data: waitTimes,
+                backgroundColor: 'rgba(240, 147, 251, 0.8)',
+                borderColor: 'rgba(240, 147, 251, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              indexAxis: 'x',
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Wait Time per Demand',
+                  font: { size: 11, weight: 'bold' }
+                },
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    title: function(context) {
+                      return 'Demand ID: ' + context[0].label;
+                    },
+                    label: function(context) {
+                      return 'Wait Time: ' + context.parsed.y.toFixed(2) + ' min';
+                    }
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    font: { size: 8 },
+                    maxRotation: 45
+                  }
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    font: { size: 9 }
+                  },
+                  title: {
+                    display: true,
+                    text: 'Wait Time (min)',
+                    font: { size: 9 }
+                  }
+                }
+              }
+            },
+            plugins: [averageLinePlugin]
+          });
+          
+          chartWaitTimeInstance.avgData = {
+            value: avgWaitTime,
+            color: 'rgb(192, 0, 0)',
+            label: 'Avg: ' + avgWaitTime.toFixed(2)
+          };
+          chartWaitTimeInstance.update('none');
+          console.log('Wait time chart created');
+        } catch (error) {
+          console.error('Error creating wait time chart:', error);
+        }
+      } else {
+        console.warn('No wait time stats available or container not found');
+      }
+      
+      // Chart 3: Hourly Demand Processing
+      const ctxHourly = document.getElementById('chart-demand-hourly');
+      if (ctxHourly && stats.timeSlots) {
+        try {
+          const times = Object.keys(stats.timeSlots).sort((a, b) => parseInt(a) - parseInt(b));
+          const labels = times.map(t => t + ' min');
+          const data = times.map(t => stats.timeSlots[t]);
+          let cumulativeSum = 0;
+          const cumulativeData = data.map(d => (cumulativeSum += d, cumulativeSum));
+          
+          new Chart(ctxHourly, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Cumulative Demands Processed',
+                data: cumulativeData,
+                backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                borderColor: 'rgba(79, 172, 254, 1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: 'rgba(79, 172, 254, 1)'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Cumulative Demand Processing (10-min intervals)',
+                  font: { size: 11, weight: 'bold' }
+                },
+                legend: {
+                  display: false
+                }
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    font: { size: 8 },
+                    maxRotation: 45
+                  }
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    font: { size: 9 }
+                  }
+                }
+              }
+            }
+          });
+          console.log('Hourly chart created');
+        } catch (error) {
+          console.error('Error creating hourly chart:', error);
+        }
+      } else {
+        console.warn('No time slot data available or container not found');
+      }
+      
+      // Chart 4: Job Type Statistics
+      const ctxJobType = document.getElementById('chart-job-type');
+      if (ctxJobType && stats.jobTypeStats) {
+        try {
+          const jobTypes = Object.keys(stats.jobTypeStats);
+          const totalByType = jobTypes.map(type => stats.jobTypeStats[type].total);
+          const completedByType = jobTypes.map(type => stats.jobTypeStats[type].completed);
+          
+          new Chart(ctxJobType, {
+            type: 'bar',
+            data: {
+              labels: jobTypes,
+              datasets: [
+                {
+                  label: 'Total Demands',
+                  data: totalByType,
+                  backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                  borderColor: 'rgba(102, 126, 234, 1)',
+                  borderWidth: 2
+                },
+                {
+                  label: 'Completed',
+                  data: completedByType,
+                  backgroundColor: 'rgba(67, 233, 123, 0.8)',
+                  borderColor: 'rgba(67, 233, 123, 1)',
+                  borderWidth: 2
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Demands by Job Type',
+                  font: { size: 11, weight: 'bold' }
+                },
+                legend: {
+                  display: true,
+                  labels: { font: { size: 9 } }
+                }
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    font: { size: 9 }
+                  }
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    font: { size: 9 }
+                  }
+                }
+              }
+            }
+          });
+          console.log('Job type chart created');
+        } catch (error) {
+          console.error('Error creating job type chart:', error);
+        }
+      } else {
+        console.warn('No job type data available or container not found');
+      }
+    }
+  </script>
+</body>
+</html>
+    

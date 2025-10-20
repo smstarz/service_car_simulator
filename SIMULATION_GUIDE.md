@@ -82,8 +82,8 @@ projects/{project-name}/
 ### vehicle_set.csv
 
 ```csv
-name,lat,lng,capacity,job_type
-Vehicle_1,37.5665,126.9780,4,call
+name,start_latitude,start_longitude,job_type
+Vehicle_1,37.5665,126.9780,call
 ```
 
 ### demand_data.csv

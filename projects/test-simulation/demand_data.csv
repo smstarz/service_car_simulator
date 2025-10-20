@@ -1,6 +1,6 @@
-request_time,lat,lng,address,job_type
-07:05,37.5680,126.9790,서울특별시 종로구 삼일대로,call
-07:10,37.5720,126.9810,서울특별시 종로구 종로,call
-07:15,37.5660,126.9860,서울특별시 종로구 인사동,call
-07:20,37.5690,126.9820,서울특별시 종로구 창경궁로,call
-07:25,37.5640,126.9870,서울특별시 종로구 돈화문로,call
+id,address,longitude,latitude,time,job_type,result,vehicle,distance,arrived_time,complete_time
+test_001,서울특별시 종로구 삼일대로,126.9790,37.5680,07:05,call,completed,vehicle_001,0.189,07:06:36,07:16:36
+test_002,서울특별시 종로구 종로,126.9810,37.5720,07:10,call,completed,vehicle_002,0.239,07:18:22,07:28:22
+test_003,서울특별시 종로구 인사동,126.9860,37.5660,07:15,call,completed,vehicle_003,0.142,07:18:27,07:28:27
+test_004,서울특별시 종로구 창경궁로,126.9820,37.5690,07:20,call,assigned,vehicle_001,0.287,07:25:06,
+test_005,서울특별시 종로구 돈화문로,126.9870,37.5640,07:25,call,rejected,,,,

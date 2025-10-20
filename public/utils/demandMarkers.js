@@ -44,7 +44,7 @@ export class DemandMarkersManager {
         type: 'circle',
         source: this.sourceId,
         paint: {
-          'circle-radius': 8,
+          'circle-radius': 5.3,
           'circle-color': '#ffffff',
           'circle-opacity': 1
         }
@@ -58,7 +58,7 @@ export class DemandMarkersManager {
         type: 'circle',
         source: this.sourceId,
         paint: {
-          'circle-radius': 6,
+          'circle-radius': 4,
           'circle-color': '#ff4444',
           'circle-opacity': 0.9,
           'circle-stroke-width': 2,

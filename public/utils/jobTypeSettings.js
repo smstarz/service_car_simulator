@@ -8,6 +8,25 @@ export class JobTypeSettingsManager {
     this.currentProjectName = null;
     this.jobTypeData = [];
     this.isModified = false;
+    this._backupJobTypeData = null;
+    this._emitTimeout = null;
+  }
+
+  // helper to emit jobtypes-updated event safely (debounced)
+  emitJobTypesUpdated() {
+    try {
+      if (this._emitTimeout) clearTimeout(this._emitTimeout);
+      this._emitTimeout = setTimeout(() => {
+        try {
+          const count = Array.isArray(this.jobTypeData) ? this.jobTypeData.length : 0;
+          document.dispatchEvent(new CustomEvent('jobtypes-updated', { detail: { count, jobTypes: this.jobTypeData } }));
+        } catch (err) {
+          // ignore
+        }
+      }, 100);
+    } catch (err) {
+      // ignore
+    }
   }
 
   /**
@@ -32,9 +51,11 @@ export class JobTypeSettingsManager {
       if (this.jobTypeData.length === 0) {
         this.jobTypeData = this.getDefaultJobTypes();
       }
+      this.emitJobTypesUpdated();
     } catch (error) {
       console.error('Failed to load job types:', error);
       this.jobTypeData = this.getDefaultJobTypes();
+      this.emitJobTypesUpdated();
     }
   }
 
@@ -212,6 +233,13 @@ export class JobTypeSettingsManager {
     const existing = document.getElementById('jobtype-settings-modal');
     if (existing) existing.remove();
 
+    // create backup so we can restore on cancel
+    try {
+      this._backupJobTypeData = JSON.parse(JSON.stringify(this.jobTypeData || []));
+    } catch (e) {
+      this._backupJobTypeData = (this.jobTypeData || []).slice();
+    }
+
     // 새 모달 추가
     const modalHTML = this.createPopupHTML();
     document.body.insertAdjacentHTML('beforeend', modalHTML);
@@ -220,12 +248,28 @@ export class JobTypeSettingsManager {
 
     // 이벤트 리스너
     document.getElementById('close-jobtype-modal').addEventListener('click', () => {
-      this.closeModal();
+      if (this.isModified) {
+        if (confirm('You have unsaved changes. Do you want to discard them?')) {
+          // restore backup
+          this.jobTypeData = this._backupJobTypeData ? JSON.parse(JSON.stringify(this._backupJobTypeData)) : (this.getDefaultJobTypes() || []);
+          this.isModified = false;
+          this.emitJobTypesUpdated();
+          this.closeModal();
+        }
+      } else {
+        this.closeModal();
+      }
     });
 
     document.getElementById('cancel-jobtype-btn').addEventListener('click', () => {
-      if (this.isModified && !confirm('You have unsaved changes. Do you want to discard them?')) {
-        return;
+      if (this.isModified) {
+        if (!confirm('You have unsaved changes. Do you want to discard them?')) {
+          return;
+        }
+        // restore backup
+        this.jobTypeData = this._backupJobTypeData ? JSON.parse(JSON.stringify(this._backupJobTypeData)) : (this.getDefaultJobTypes() || []);
+        this.isModified = false;
+        this.emitJobTypesUpdated();
       }
       this.closeModal();
     });
@@ -264,18 +308,26 @@ export class JobTypeSettingsManager {
 
         this.jobTypeData[idx][field] = value;
         this.isModified = true;
+        this.emitJobTypesUpdated();
       });
 
       input.addEventListener('input', (e) => {
         this.isModified = true;
+        this.emitJobTypesUpdated();
       });
     });
 
     // 모달 외부 클릭 시 닫기
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
-        if (this.isModified && !confirm('You have unsaved changes. Do you want to discard them?')) {
-          return;
+        if (this.isModified) {
+          if (!confirm('You have unsaved changes. Do you want to discard them?')) {
+            return;
+          }
+          // restore backup
+          this.jobTypeData = this._backupJobTypeData ? JSON.parse(JSON.stringify(this._backupJobTypeData)) : (this.getDefaultJobTypes() || []);
+          this.isModified = false;
+          this.emitJobTypesUpdated();
         }
         this.closeModal();
       }
@@ -314,6 +366,7 @@ export class JobTypeSettingsManager {
 
     // 테이블 다시 렌더링
     this.updateTableBody();
+    this.emitJobTypesUpdated();
   }
 
   /**
@@ -325,6 +378,7 @@ export class JobTypeSettingsManager {
 
     // 테이블 다시 렌더링
     this.updateTableBody();
+    this.emitJobTypesUpdated();
   }
 
   /**
@@ -395,5 +449,7 @@ export class JobTypeSettingsManager {
         this.addJobType();
       });
     }
+    // notify external UI
+    this.emitJobTypesUpdated();
   }
 }

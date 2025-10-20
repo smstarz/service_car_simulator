@@ -32,9 +32,40 @@ class VehicleStateManager {
    * @param {Object} vehicle - 차량 객체
    */
   registerVehicle(vehicle) {
+    // 초기 위치 추출 (여러 필드명 형식 지원)
+    let initialLng, initialLat, currentLng, currentLat;
+    
+    if (vehicle.current_lng !== undefined && vehicle.current_lat !== undefined) {
+      currentLng = vehicle.current_lng;
+      currentLat = vehicle.current_lat;
+      initialLng = vehicle.current_lng;
+      initialLat = vehicle.current_lat;
+    } else if (vehicle.location && Array.isArray(vehicle.location) && vehicle.location.length === 2) {
+      currentLng = vehicle.location[0];
+      currentLat = vehicle.location[1];
+      initialLng = vehicle.location[0];
+      initialLat = vehicle.location[1];
+    } else if (vehicle.start_longitude !== undefined && vehicle.start_latitude !== undefined) {
+      currentLng = vehicle.start_longitude;
+      currentLat = vehicle.start_latitude;
+      initialLng = vehicle.start_longitude;
+      initialLat = vehicle.start_latitude;
+    } else if (vehicle.initialLocation && Array.isArray(vehicle.initialLocation) && vehicle.initialLocation.length === 2) {
+      currentLng = vehicle.initialLocation[0];
+      currentLat = vehicle.initialLocation[1];
+      initialLng = vehicle.initialLocation[0];
+      initialLat = vehicle.initialLocation[1];
+    }
+    
     // 차량 상태 초기화
     const enhancedVehicle = {
       ...vehicle,
+      
+      // 위치 정보 (정규화)
+      current_lng: currentLng,
+      current_lat: currentLat,
+      initial_lng: initialLng,
+      initial_lat: initialLat,
       
       // 상태 정보
       state: vehicle.state || VehicleState.IDLE,
@@ -53,22 +84,15 @@ class VehicleStateManager {
       service_start_time: null,
       service_end_time: null,
       
-      // 차량 속성
-      capacity: vehicle.capacity || 4,
-      
       // 통계
       total_jobs: 0,              // 총 처리한 작업 수
       total_distance: 0,          // 총 이동 거리
       total_service_time: 0,      // 총 서비스 시간
-      idle_time: 0,               // 총 대기 시간
-      
-      // 초기 위치 저장
-      initial_lng: vehicle.current_lng || vehicle.start_longitude,
-      initial_lat: vehicle.current_lat || vehicle.start_latitude
+      idle_time: 0               // 총 대기 시간
     };
     
     this.vehicles.set(vehicle.id || vehicle.name, enhancedVehicle);
-    console.log(`✅ 차량 등록: ${vehicle.name} (상태: ${enhancedVehicle.state})`);
+    console.log(`✅ 차량 등록: ${vehicle.name} at [${currentLng}, ${currentLat}] (상태: ${enhancedVehicle.state})`);
   }
 
   /**
@@ -113,9 +137,13 @@ class VehicleStateManager {
   }
 
   /**
-   * 차량 상태 업데이트
+   * 차량 상태 업데이트 (타임라인 기록 포함)
+   * @param {string} vehicleId - 차량 ID
+   * @param {string} newState - 새로운 상태
+   * @param {number} timestamp - 현재 시뮬레이션 시간 (초)
+   * @param {Object} eventData - 추가 이벤트 데이터 (선택)
    */
-  updateVehicleState(vehicleId, newState) {
+  updateVehicleState(vehicleId, newState, timestamp = null, eventData = {}) {
     const vehicle = this.vehicles.get(vehicleId);
     if (!vehicle) {
       console.error(`❌ 차량을 찾을 수 없음: ${vehicleId}`);
@@ -123,8 +151,30 @@ class VehicleStateManager {
     }
     
     const oldState = vehicle.state;
+    
+    // 상태가 실제로 변경될 때만 처리
+    if (oldState === newState && !eventData.force) {
+      return true;
+    }
+    
     vehicle.state = newState;
-    console.log(`🔄 ${vehicle.name}: ${oldState} → ${newState}`);
+    
+    // 타임라인에 상태 변경 기록
+    if (!vehicle.timeline) {
+      vehicle.timeline = [];
+    }
+    
+    const timelineEntry = {
+      timestamp: timestamp !== null ? timestamp : this.currentSimulationTime,
+      type: eventData.type || 'state_change',
+      state: newState,
+      location: vehicle.location || [vehicle.current_lng, vehicle.current_lat],
+      ...eventData
+    };
+    
+    vehicle.timeline.push(timelineEntry);
+    
+    console.log(`🔄 ${vehicle.name}: ${oldState} → ${newState} (time: ${timelineEntry.timestamp})`);
     return true;
   }
 
@@ -144,7 +194,143 @@ class VehicleStateManager {
   }
 
   /**
-   * 수요 배차 처리
+   * 수요 배차 처리 (차량 상태를 MOVING으로 변경)
+   * @param {string} vehicleId - 차량 ID
+   * @param {string} demandId - 수요 ID
+   * @param {Object} route - 경로 정보
+   * @param {Array} targetLocation - 목적지 좌표 [lng, lat]
+   * @param {number} timestamp - 현재 시뮬레이션 시간 (초)
+   * @param {Object} additionalData - 추가 데이터
+   */
+  dispatchVehicle(vehicleId, demandId, route, targetLocation, timestamp, additionalData = {}) {
+    const vehicle = this.vehicles.get(vehicleId);
+    if (!vehicle) {
+      console.error(`❌ 차량을 찾을 수 없음: ${vehicleId}`);
+      return false;
+    }
+    
+    // 차량 배차 정보 업데이트
+    vehicle.assigned_demand_id = demandId;
+    vehicle.current_route = route;
+    vehicle.route_start_time = timestamp;
+    vehicle.estimated_arrival = timestamp + (route.duration || 0);
+    vehicle.target_location = targetLocation;
+    
+    // location 배열도 업데이트
+    if (!vehicle.location) {
+      vehicle.location = [vehicle.current_lng, vehicle.current_lat];
+    }
+    
+    // 상태를 MOVING으로 변경 (타임라인 기록 포함)
+    this.updateVehicleState(vehicleId, VehicleState.MOVING_TO_DEMAND, timestamp, {
+      type: 'demand_assigned',
+      demandId: demandId,
+      targetLocation: targetLocation,
+      estimatedArrival: vehicle.estimated_arrival,
+      ...additionalData
+    });
+    
+    console.log(`🚗 ${vehicle.name} 배차됨: ${demandId} (ETA: ${vehicle.estimated_arrival})`);
+    return true;
+  }
+
+  /**
+   * 차량 도착 처리 (차량 상태를 WORKING으로 변경)
+   * @param {string} vehicleId - 차량 ID
+   * @param {number} timestamp - 현재 시뮬레이션 시간 (초)
+   * @param {number} serviceTime - 서비스 시간 (초)
+   */
+  arriveAtDemand(vehicleId, timestamp, serviceTime) {
+    const vehicle = this.vehicles.get(vehicleId);
+    if (!vehicle) {
+      console.error(`❌ 차량을 찾을 수 없음: ${vehicleId}`);
+      return false;
+    }
+    
+    // 차량 위치를 목적지로 업데이트
+    if (vehicle.target_location) {
+      vehicle.location = [...vehicle.target_location];
+      vehicle.current_lng = vehicle.target_location[0];
+      vehicle.current_lat = vehicle.target_location[1];
+    }
+    
+    // 서비스 시간 설정
+    vehicle.service_start_time = timestamp;
+    vehicle.service_end_time = timestamp + serviceTime;
+    
+    // 상태를 WORKING으로 변경 (타임라인 기록 포함)
+    this.updateVehicleState(vehicleId, VehicleState.WORKING, timestamp, {
+      type: 'arrived_at_demand',
+      demandId: vehicle.assigned_demand_id,
+      location: vehicle.location,
+      serviceTime: serviceTime,
+      estimatedCompletion: vehicle.service_end_time
+    });
+    
+    // 통계 업데이트: 이동 거리 및 시간
+    if (vehicle.current_route) {
+      vehicle.total_distance += (vehicle.current_route.distance || 0) / 1000; // km로 변환
+      const movingTime = timestamp - vehicle.route_start_time;
+      if (!vehicle.statistics) {
+        vehicle.statistics = { moving_time: 0, working_time: 0, idle_time: 0, total_distance: 0 };
+      }
+      vehicle.statistics.moving_time = (vehicle.statistics.moving_time || 0) + movingTime;
+      vehicle.statistics.total_distance = vehicle.total_distance; // statistics에도 반영
+    }
+    
+    console.log(`✅ ${vehicle.name} 도착: ${vehicle.assigned_demand_id}`);
+    return true;
+  }
+
+  /**
+   * 작업 완료 처리 (차량 상태를 IDLE로 변경)
+   * @param {string} vehicleId - 차량 ID
+   * @param {number} timestamp - 현재 시뮬레이션 시간 (초)
+   */
+  completeWork(vehicleId, timestamp) {
+    const vehicle = this.vehicles.get(vehicleId);
+    if (!vehicle) {
+      console.error(`❌ 차량을 찾을 수 없음: ${vehicleId}`);
+      return false;
+    }
+    
+    const serviceTime = vehicle.service_end_time - vehicle.service_start_time;
+    
+    // 통계 업데이트
+    vehicle.total_jobs = (vehicle.total_jobs || 0) + 1;
+    vehicle.total_service_time = (vehicle.total_service_time || 0) + serviceTime;
+    
+    if (!vehicle.statistics) {
+      vehicle.statistics = { total_jobs: 0, working_time: 0, moving_time: 0, idle_time: 0, total_distance: 0 };
+    }
+    vehicle.statistics.total_jobs = vehicle.total_jobs;
+    vehicle.statistics.working_time = (vehicle.statistics.working_time || 0) + serviceTime;
+    vehicle.statistics.total_distance = vehicle.total_distance; // statistics에도 반영
+    
+    const completedDemandId = vehicle.assigned_demand_id;
+    
+    // 배차 정보 초기화
+    vehicle.assigned_demand_id = null;
+    vehicle.current_route = null;
+    vehicle.route_start_time = null;
+    vehicle.estimated_arrival = null;
+    vehicle.target_location = null;
+    vehicle.service_start_time = null;
+    vehicle.service_end_time = null;
+    
+    // 상태를 IDLE로 변경 (타임라인 기록 포함)
+    this.updateVehicleState(vehicleId, VehicleState.IDLE, timestamp, {
+      type: 'work_completed',
+      demandId: completedDemandId,
+      location: vehicle.location
+    });
+    
+    console.log(`🎉 ${vehicle.name} 작업 완료: ${completedDemandId} (총 ${vehicle.total_jobs}건)`);
+    return true;
+  }
+
+  /**
+   * 수요 배차 처리 (레거시 메서드 - 호환성 유지)
    * @param {string} vehicleId - 차량 ID
    * @param {Object} demand - 수요 객체
    * @param {Object} route - 경로 정보 (TMAP API 결과)
@@ -210,9 +396,10 @@ class VehicleStateManager {
   }
 
   /**
-   * 작업 완료 (차량이 다시 IDLE 상태로)
+   * 작업 완료 (차량이 다시 IDLE 상태로) - DEPRECATED
+   * @deprecated 새로운 completeWork(vehicleId, timestamp) 메서드를 사용하세요
    */
-  completeWork(vehicleId) {
+  _legacyCompleteWork(vehicleId) {
     const vehicle = this.vehicles.get(vehicleId);
     if (!vehicle) return false;
     
@@ -455,10 +642,16 @@ class VehicleStateManager {
   }
   
   /**
-   * 자동 상태 전이 처리
+   * 자동 상태 전이 처리 (DEPRECATED - SimulationEngine에서 처리)
    * @param {number} currentTime - 현재 시뮬레이션 시간
+   * @deprecated 이제 SimulationEngine.checkVehicleStateChanges()에서 처리합니다.
    */
   updateVehicleStates(currentTime) {
+    // SimulationEngine에서 직접 arriveAtDemand() 및 completeWork()를 호출하므로
+    // 이 메서드는 더 이상 사용되지 않습니다.
+    // 호환성을 위해 메서드는 유지하되, 로직은 비활성화합니다.
+    
+    /* DEPRECATED CODE - 주석 처리
     this.vehicles.forEach(vehicle => {
       
       // MOVING_TO_DEMAND → WORKING (도착)
@@ -477,6 +670,7 @@ class VehicleStateManager {
         }
       }
     });
+    */
   }
 
   /**

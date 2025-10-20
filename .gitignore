@@ -1,0 +1,63 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+*.tgz
+
+# Build
+dist/
+build/
+.next/
+out/
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Logs
+logs/
+.pnp/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Coverage
+coverage/
+
+# Runtime files
+.nyc_output/
+.sass-cache/
+/.parcel-cache/
+
+# Test output
+test-output/
+
+# Reports and temporary
+*.report.html
+*.tmp
+
+# Projects: ignore all project folders except keep projects/default
+projects/*
+!projects/default/
+
+# Public and generated data caches
+public/data/
+
+# Simulation outputs
+*.simulation_result.json
+*.simulation_report.html

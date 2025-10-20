@@ -1,6 +1,6 @@
 # Service Car Simulator
 
-서비스 차량 배차 및 운행 시뮬레이터입니다. Mapbox Isochrone API와 TMAP Route API를 활용하여 실시간 차량 배차 및 경로 추적 기능을 제공합니다.
+서비스 차량 배차 및 운행 시뮬레이터입니다. Mapbox GL JS와 TMAP Route API를 활용하여 실시간 차량 배차, 경로 추적, 그리고 **인터랙티브 시각화 재생** 기능을 제공합니다.
 
 ## 🚀 주요 기능
 
@@ -11,12 +11,21 @@
 - 차량 상태 관리 (IDLE → MOVING → WORKING)
 - 실시간 위치 보간 (Route segment 기반)
 
-### 2. **Timestamp 기반 기록**
+### 2. **🎬 인터랙티브 시각화 (NEW!)**
+- **차량 실시간 추적**: 타임라인 이벤트 기반 위치 보간 애니메이션
+- **경로 시각화**: 이동 중인 차량의 경로 실시간 표시
+- **수요 상태 변화**: 발생 → 배차 → 완료/거절 단계별 색상 변화
+- **플레이백 컨트롤**: 재생/정지, 속도 조절 (x1, x2, x5), 타임라인 슬라이더
+- **상호작용**: 차량/수요 클릭 시 상세 정보 팝업
+
+**자세한 내용**: [시각화 시스템 문서](./docs/VISUALIZATION_SYSTEM.md)
+
+### 3. **Timestamp 기반 기록**
 - 모든 이벤트를 timestamp와 함께 기록
 - 차량 timeline, 수요 처리 내역, 경로 정보 포함
 - JSON 파일로 저장 (재생 가능)
 
-### 3. **배차 알고리즘**
+### 4. **배차 알고리즘**
 - 4단계 필터링: 상태 체크 → Isochrone 폴리곤 → Job type 매칭 → 최단 거리
 - Ray Casting Algorithm으로 폴리곤 내부 차량 판정
 - Haversine Formula로 거리 계산
@@ -122,9 +131,9 @@ projects/{project-name}/
 ### vehicle_set.csv
 
 ```csv
-name,lat,lng,capacity,job_type
-Vehicle_1,37.5665,126.9780,4,call
-Vehicle_2,37.5700,126.9800,4,call
+name,start_latitude,start_longitude,job_type
+Vehicle_1,37.5665,126.9780,call
+Vehicle_2,37.5700,126.9800,call
 ```
 
 ### demand_data.csv
