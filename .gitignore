@@ -15,9 +15,6 @@ out/
 
 # Environment files
 .env
-.env.*
-!.env.example
-!.env.sample
 
 # Logs
 logs/
@@ -46,6 +43,12 @@ coverage/
 
 # Test output
 test-output/
+
+# Tests (development only)
+tests/
+
+# Docs (development documentation)
+docs/
 
 # Reports and temporary
 *.report.html

@@ -1,7 +1,0 @@
-id,address,longitude,latitude,time,job_type,result,vehicle,distance,arrived_time,complete_time
-, ,126.9784,37.5665,12:30:00,delivery,,,,,
-ABCDEF,Seoul Station,126.9784,37.5665,25:00:00,pickup,,,,,
-abc,Somewhere,127.0,37.5,09:15:00,delivery,,,,,
-ZZ1234,Elsewhere,127.1,37.6,10:00:00,pickup,,,,,
-ZZ1234,Other,127.2,37.7,11:00:00,delivery,,,,,
-,AddressOnly,127.3,37.8,08:00:00,pickup,,,,,
