@@ -1,2 +1,4 @@
 ﻿id,job,service_time
 0001,normal,15
+0002,delivery,10
+0003,pickup,5

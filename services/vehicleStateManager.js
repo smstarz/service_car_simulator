@@ -57,6 +57,18 @@ class VehicleStateManager {
       initialLat = vehicle.initialLocation[1];
     }
     
+    // Job Type 파싱 (문자열을 배열로 변환)
+    let jobTypes = [];
+    if (Array.isArray(vehicle.job_type)) {
+      jobTypes = vehicle.job_type;
+    } else if (typeof vehicle.job_type === 'string') {
+      // 세미콜론으로 구분된 복수 값을 배열로 파싱
+      jobTypes = vehicle.job_type
+        .split(';')
+        .map(type => type.trim())
+        .filter(type => type.length > 0);
+    }
+    
     // 차량 상태 초기화
     const enhancedVehicle = {
       ...vehicle,
@@ -66,6 +78,9 @@ class VehicleStateManager {
       current_lat: currentLat,
       initial_lng: initialLng,
       initial_lat: initialLat,
+      
+      // Job Type (배열로 정규화)
+      job_type: jobTypes,
       
       // 상태 정보
       state: vehicle.state || VehicleState.IDLE,
@@ -92,7 +107,7 @@ class VehicleStateManager {
     };
     
     this.vehicles.set(vehicle.id || vehicle.name, enhancedVehicle);
-    console.log(`✅ 차량 등록: ${vehicle.name} at [${currentLng}, ${currentLat}] (상태: ${enhancedVehicle.state})`);
+    console.log(`✅ 차량 등록: ${vehicle.name} at [${currentLng}, ${currentLat}] (상태: ${enhancedVehicle.state}, job_type: ${jobTypes.join(', ')})`);
   }
 
   /**

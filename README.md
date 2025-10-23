@@ -133,16 +133,27 @@ projects/{project-name}/
 ```csv
 name,start_latitude,start_longitude,job_type
 Vehicle_1,37.5665,126.9780,call
-Vehicle_2,37.5700,126.9800,call
+Vehicle_2,37.5700,126.9800,call;delivery
+Vehicle_3,37.5720,126.9810,delivery;pickup
 ```
+
+**Job Type 설명:**
+- 각 차량은 **하나 이상의 job_type**을 지원할 수 있습니다
+- 여러 job_type은 **세미콜론(`;`)**으로 구분하여 입력합니다
+- 수요의 job_type과 **하나라도 매칭되면** 배차 대상에 포함됩니다
+- 예: `call;delivery` → call 또는 delivery 수요 모두 배차 가능
 
 ### demand_data.csv
 
 ```csv
 request_time,lat,lng,address,job_type
 07:05,37.5680,126.9790,서울특별시 종로구 삼일대로,call
-07:10,37.5720,126.9810,서울특별시 종로구 종로,call
+07:10,37.5720,126.9810,서울특별시 종로구 종로,delivery
 ```
+
+**Job Type 설명:**
+- 각 수요는 **단일 job_type**을 가집니다
+- job_type은 job_type.csv에 정의된 값이어야 합니다
 
 ### job_type.csv
 
@@ -150,6 +161,7 @@ request_time,lat,lng,address,job_type
 id,job,service_time
 0001,call,15
 0002,delivery,20
+0003,pickup,10
 ```
 
 ## 🛣️ TMAP Route Service
@@ -183,7 +195,7 @@ Mapbox Isochrone API를 사용하여 수요 발생 시 도달 가능한 영역�
 4. **자동 상태 전이**: 시뮬레이션 시간에 따라 자동으로 차량 상태 변경 (이동→작업→완료)
 5. **Job Type별 작업 시간 관리**: `job_type.csv`에서 각 작업 유형의 service_time 자동 조회
 6. **폴리곤 내부 차량 탐색**: Ray Casting 알고리즘을 사용하여 Isochrone 영역 내 차량 필터링
-7. **Job Type 매칭**: 수요의 job_type과 일치하는 차량만 선택
+7. **다중 Job Type 매칭**: 차량이 여러 job_type을 지원하며, 수요 job_type과 **하나라도 매칭되면** 배차 대상 포함
 8. **최단 거리 차량 배차**: Haversine 공식으로 직선 거리를 계산하여 가장 가까운 차량 배차
 
 ### 차량 상태(State)
@@ -223,7 +235,21 @@ IDLE → MOVING_TO_DEMAND → WORKING → IDLE
 
 ### Job Type 관리
 
-각 수요(demand)의 `job_type`에 따라 작업 시간이 자동으로 결정됩니다.
+#### 다중 Job Type 지원
+
+각 차량은 **여러 개의 job_type**을 지원할 수 있습니다:
+
+```csv
+name,start_latitude,start_longitude,job_type
+Vehicle_1,37.5665,126.9780,call
+Vehicle_2,37.5700,126.9800,call;delivery
+Vehicle_3,37.5720,126.9810,delivery;pickup
+```
+
+**배차 로직:**
+- 수요의 job_type과 차량이 지원하는 job_type 중 **하나라도 매칭되면** 배차 대상에 포함
+- 예: 수요 job_type = `delivery` → Vehicle_2, Vehicle_3 모두 배차 가능
+- 각 수요(demand)의 `job_type`에 따라 작업 시간(`service_time`)이 자동으로 결정됨
 
 **설정 파일**: `projects/{project-name}/job_type.csv`
 
@@ -250,7 +276,7 @@ Isochrone 폴리곤 생성 (waitTimeLimit)
   ↓
 폴리곤 내부 차량 필터링
   ↓
-Job Type 일치 차량 필터링
+Job Type 일치 차량 필터링 (다중 매칭 지원)
   ↓
 최단 거리 차량 선택
   ↓

@@ -142,10 +142,23 @@ class DispatchEngine {
    */
   filterVehiclesByJobType(vehicles, demandJobType) {
     return vehicles.filter(vehicle => {
-      const matches = vehicle.job_type === demandJobType;
+      // 차량의 job_type이 배열인 경우 (복수 값 지원)
+      let vehicleJobTypes = [];
+      
+      if (Array.isArray(vehicle.job_type)) {
+        vehicleJobTypes = vehicle.job_type;
+      } else if (typeof vehicle.job_type === 'string') {
+        // 문자열인 경우 그대로 단일 항목 배열로 변환
+        vehicleJobTypes = [vehicle.job_type];
+      }
+      
+      // demand의 job_type이 차량의 job_type 배열에 포함되는지 확인
+      const matches = vehicleJobTypes.includes(demandJobType);
       
       if (matches) {
-        console.log(`   ✓ ${vehicle.name}: job_type 일치 (${demandJobType})`);
+        console.log(`   ✓ ${vehicle.name}: job_type 일치 (${demandJobType}) [지원: ${vehicleJobTypes.join(', ')}]`);
+      } else {
+        console.log(`   ✗ ${vehicle.name}: job_type 불일치 (요구: ${demandJobType}, 지원: ${vehicleJobTypes.join(', ')})`);
       }
       
       return matches;

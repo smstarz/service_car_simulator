@@ -1,10 +1,10 @@
 ﻿name,start_latitude,start_longitude,job_type
 vehicle_01,37.50068854,127.0181002,normal
-vehicle_02,37.49340059,127.0220642,normal
+vehicle_02,37.49340059,127.0220642,normal;delivery
 vehicle_03,37.50262942,127.031134,normal
-vehicle_04,37.50574359,127.0193388,normal
+vehicle_04,37.50574359,127.0193388,normal;delivery;pickup
 vehicle_05,37.49633844,127.0181959,normal
-vehicle_06,37.49227276,127.0277071,normal
+vehicle_06,37.49227276,127.0277071,normal;pickup
 vehicle_07,37.48843072,127.0215768,normal
 vehicle_08,37.50089769,127.0284988,normal
 vehicle_09,37.49230881,127.0293853,normal

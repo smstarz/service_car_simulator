@@ -110,7 +110,13 @@ class SimulationEngine {
     const dataLines = lines.slice(1);
     
     this.vehicles = dataLines.map((line, index) => {
-      const [name, lat, lng, job_type] = line.split(',').map(s => s.trim());
+      const [name, lat, lng, job_type_raw] = line.split(',').map(s => s.trim());
+      
+      // Job Type을 배열로 파싱 (세미콜론으로 구분된 복수 값 지원)
+      const job_type = job_type_raw
+        .split(';')
+        .map(type => type.trim())
+        .filter(type => type.length > 0);
       
       return {
         id: `vehicle_${String(index + 1).padStart(3, '0')}`,
