@@ -64,3 +64,6 @@ public/data/
 # Simulation outputs
 *.simulation_result.json
 *.simulation_report.html
+
+# aws key files
+*.pem

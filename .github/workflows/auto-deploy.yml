@@ -1,0 +1,25 @@
+name: Auto Deploy to Server
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: rsync files to server
+        run: |
+          rsync -az --delete --exclude='.git' --exclude='node_modules' ./ ubuntu@${{ secrets.DEPLOY_HOST }}:/home/ubuntu/Service_car_simulator
+
+      - name: Remote deploy commands
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEPLOY_HOST }} 'sudo mkdir -p /var/www/service_car_simulator; sudo chown -R ubuntu:ubuntu /var/www/service_car_simulator; mv /home/ubuntu/Service_car_simulator/* /var/www/service_car_simulator/ || true; cd /var/www/service_car_simulator; chmod +x scripts/*.sh; sudo bash scripts/deploy.sh'

@@ -802,6 +802,9 @@ app.get('/api/simulation/status/:projectName', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+app.listen(process.env.PORT || 8080, '0.0.0.0', () => {
+  console.log('Server running on port', process.env.PORT || 8080);
+
+// app.listen(PORT, () => {
+//   console.log(`Server listening on http://localhost:${PORT}`);
 });
